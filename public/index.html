@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="app_title">FinTrack — Financial Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+:root,[data-theme="light"]{
+  --bg:#f7f6f2;--sur:#f9f8f5;--off:#f3f0ec;--bor:#d4d1ca;--div:#dcd9d5;
+  --txt:#28251d;--mut:#7a7974;--inv:#f9f8f4;
+  --pri:#01696f;--prih:#0c4e54;--prhl:#cedcd8;
+  --suc:#437a22;--suchl:#d4dfcc;--err:#a12c7b;--errhl:#e0ced7;
+  --gld:#d19900;--gldhl:#e9e0c6;--blu:#006494;--bluhl:#c6d8e4;
+  --ora:#da7101;--orahl:#e7d7c4;--pur:#7a39bb;--purhl:#dacfde;
+  --sh2:0 4px 12px rgba(0,0,0,.08);--sh3:0 12px 32px rgba(0,0,0,.12);
+  --rsm:.375rem;--rmd:.5rem;--rlg:.75rem;--rxl:1rem;--rfl:9999px;
+  --tr:180ms cubic-bezier(.16,1,.3,1);
+  --font:'Inter','Helvetica Neue',sans-serif;
+  --xs:.8125rem;--sm:.9375rem;--base:1rem;--lg:1.25rem;
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;
+  --s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;
+}
+[data-theme="dark"]{
+  --bg:#171614;--sur:#1c1b19;--off:#1d1c1a;--bor:#393836;--div:#262523;
+  --txt:#cdccca;--mut:#797876;--inv:#2b2a28;
+  --pri:#4f98a3;--prih:#227f8b;--prhl:#313b3b;
+  --suc:#6daa45;--suchl:#3a4435;--err:#d163a7;--errhl:#4c3d46;
+  --gld:#e8af34;--gldhl:#4d4332;--blu:#5591c7;--bluhl:#3a4550;
+  --ora:#fdab43;--orahl:#564b3e;--pur:#a86fdf;--purhl:#4e4652;
+  --sh2:0 4px 12px rgba(0,0,0,.3);--sh3:0 12px 32px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);font-size:var(--sm);color:var(--txt);background:var(--bg);min-height:100vh}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);border-radius:var(--rmd);font-size:var(--sm);font-weight:500;transition:background var(--tr),color var(--tr);white-space:nowrap}
+.btn i{width:14px;height:14px}
+.bp{background:var(--pri);color:var(--inv)}.bp:hover{background:var(--prih)}
+.bg{color:var(--mut);border:1px solid var(--bor)}.bg:hover{background:var(--off);color:var(--txt)}
+.mb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:var(--s4);backdrop-filter:blur(4px)}
+.mb.hide{display:none}
+.mo{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rxl);padding:var(--s6);width:100%;max-width:420px;box-shadow:var(--sh3);animation:su .2s cubic-bezier(.16,1,.3,1)}
+@keyframes su{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mttl{font-size:var(--base);font-weight:700;margin-bottom:var(--s5);display:flex;align-items:center;gap:var(--s2)}
+.mttl i{width:18px;height:18px;color:var(--pri)}
+.fg{display:flex;flex-direction:column;gap:var(--s4)}
+.fgrp{display:flex;flex-direction:column;gap:var(--s1)}
+.fl{font-size:var(--xs);font-weight:600;color:var(--mut)}
+.fi{background:var(--off);border:1px solid var(--bor);border-radius:var(--rmd);padding:var(--s2) var(--s3);font-size:var(--sm);color:var(--txt);width:100%;transition:border-color var(--tr)}
+.fi:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,152,163,.15)}
+.fa{display:flex;gap:var(--s3);justify-content:flex-end;margin-top:var(--s2)}
+.tabs{display:flex;background:var(--off);border-radius:var(--rmd);padding:3px;gap:2px;margin-bottom:var(--s5)}
+.tab{flex:1;padding:var(--s2);border-radius:calc(var(--rmd) - 3px);font-size:var(--sm);font-weight:500;color:var(--mut);cursor:pointer;text-align:center;transition:background var(--tr),color var(--tr)}
+.tab.on{background:var(--sur);color:var(--txt);box-shadow:0 1px 2px rgba(0,0,0,.1);font-weight:600}
+.msg{font-size:var(--xs);padding:var(--s2) var(--s3);border-radius:var(--rmd);display:none;margin-bottom:var(--s3)}
+.msg.show{display:block}
+.err{background:var(--errhl);color:var(--err)}
+.ok{background:var(--suchl);color:var(--suc)}
+nav{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s8);border-bottom:1px solid var(--bor);background:var(--sur);position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:var(--s3);font-size:var(--base);font-weight:700;text-decoration:none;color:var(--txt)}
+.logo-ic{width:32px;height:32px;background:var(--pri);border-radius:var(--rmd);display:flex;align-items:center;justify-content:center}
+.logo span{color:var(--pri)}
+.nav-r{display:flex;gap:var(--s3);align-items:center}
+.theme-btn{padding:var(--s2);border-radius:var(--rmd);color:var(--mut);transition:background var(--tr)}
+.theme-btn:hover{background:var(--off);color:var(--txt)}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:5rem var(--s8) 4rem;gap:var(--s5);max-width:900px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:var(--s2);padding:var(--s1) var(--s4);border-radius:var(--rfl);background:var(--prhl);color:var(--pri);font-size:var(--xs);font-weight:600;border:1px solid rgba(79,152,163,.25)}
+h1{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.08}
+h1 span{color:var(--pri)}
+.sub{font-size:var(--base);color:var(--mut);max-width:46ch;line-height:1.65}
+.ctas{display:flex;gap:var(--s3);flex-wrap:wrap;justify-content:center}
+.btnlg{padding:var(--s3) var(--s6);font-size:var(--base)}
+.btnlg i{width:18px;height:18px}
+.feats{padding:2rem var(--s8) 5rem;max-width:1100px;margin:0 auto}
+.ft{text-align:center;font-size:var(--lg);font-weight:700;margin-bottom:var(--s2);letter-spacing:-.02em}
+.fs{text-align:center;color:var(--mut);font-size:var(--sm);margin-bottom:var(--s8)}
+.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s4)}
+.fc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rlg);padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3);transition:box-shadow var(--tr)}
+.fc:hover{box-shadow:var(--sh2)}
+.fic{width:44px;height:44px;border-radius:var(--rmd);display:flex;align-items:center;justify-content:center}
+.fic i{width:22px;height:22px}
+.fn{font-size:var(--sm);font-weight:700}
+.fd{font-size:var(--xs);color:var(--mut);line-height:1.65}
+footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);border-top:1px solid var(--div)}
+@media(max-width:600px){
+  nav{padding:var(--s3) var(--s4);gap:var(--s2)}
+  .logo{font-size:var(--sm);gap:var(--s2)}
+  .logo-ic{width:28px;height:28px}
+  .nav-r{gap:var(--s2)}
+  .nav-r .btn{padding:var(--s1) var(--s3);font-size:var(--xs)}
+  .hero{padding:3rem var(--s4) 2.5rem}
+  h1{font-size:clamp(1.75rem,7vw,2.2rem)}
+  .sub{font-size:var(--sm)}
+  .btnlg{padding:var(--s2) var(--s4);font-size:var(--sm)}
+  .feats{padding:1.5rem var(--s4) 3rem}
+  .fg2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="mb hide" id="m-auth">
+  <div class="mo">
+    <div class="mttl"><i data-lucide="log-in"></i><span id="auth-ttl" data-i18n="login_title">Login to FinTrack</span></div>
+    <div class="tabs">
+      <div class="tab on" id="tab-in" onclick="switchTab('login')" data-i18n="login">Login</div>
+      <div class="tab" id="tab-reg" onclick="switchTab('register')" data-i18n="register">Register</div>
+    </div>
+    <div class="msg err" id="auth-err"></div>
+    <div class="msg ok"  id="auth-ok"></div>
+    <form class="fg" id="form-auth" onsubmit="submitAuth(event)">
+      <!-- Step 1: Email & Password -->
+      <div id="step-1">
+        <div class="fgrp">
+          <label class="fl" data-i18n="email">Email</label>
+          <input class="fi" id="a-email" type="email" placeholder="you@email.com" required autocomplete="email" data-i18n="email">
+        </div>
+        <div class="fgrp" style="margin-top:var(--s4)" id="grp-pass">
+          <label class="fl" data-i18n="password">Password</label>
+          <div style="position:relative; display:flex; align-items:center;">
+            <input class="fi" id="a-pass" type="password" placeholder="Minimum 8 characters" required minlength="8" autocomplete="current-password" data-i18n="password" style="padding-right: 40px;">
+            <button type="button" tabindex="-1" onclick="togglePassword('a-pass', 'eye-pass')" style="position:absolute; right:10px; color:var(--mut); display:flex; align-items:center; justify-content:center;"><i id="eye-pass" data-lucide="eye" style="width:18px;height:18px;"></i></button>
+          </div>
+          <div style="text-align:right; margin-top:var(--s1)" id="btn-forgot-pass-div"><button type="button" style="font-size:var(--xs); color:var(--pri); font-weight:500;" onclick="startForgotPass()" data-i18n="forgot_password">Forgot Password?</button></div>
+        </div>
+        <div class="fgrp" id="pass-hint" style="display:none;margin-top:var(--s1)">
+          <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">⚠️ Must contain an uppercase letter and a number.</p>
+        </div>
+      </div>
+      
+      <!-- Step 2: OTP Entry -->
+      <div id="step-otp" style="display:none">
+        <p style="font-size:var(--sm);margin-bottom:var(--s3);line-height:1.5" data-i18n="otp_msg">We have sent a 6-digit OTP code to your email (check Ethereal Email for dev). Enter the code below.</p>
+        <div class="fgrp">
+          <label class="fl" data-i18n="otp_code">OTP Code</label>
+          <input class="fi" id="a-otp" type="text" placeholder="123456" maxlength="6" pattern="[0-9]{6}">
+        </div>
+      </div>
+
+      <!-- Step 3: PIN Entry (Setup or Verify) -->
+      <div id="step-pin" style="display:none">
+        <p style="font-size:var(--sm);margin-bottom:var(--s3);line-height:1.5" id="pin-desc" data-i18n="pin_verify_msg">Enter your 6-digit security PIN.</p>
+        <div class="fgrp">
+          <label class="fl" data-i18n="pin_security">Security PIN</label>
+          <div style="position:relative; display:flex; align-items:center;">
+            <input class="fi" id="a-pin" type="password" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" style="padding-right: 40px;">
+            <button type="button" tabindex="-1" onclick="togglePassword('a-pin', 'eye-pin')" style="position:absolute; right:10px; color:var(--mut); display:flex; align-items:center; justify-content:center;"><i id="eye-pin" data-lucide="eye" style="width:18px;height:18px;"></i></button>
+          </div>
+          <div style="text-align:right; margin-top:var(--s1); display:none;" id="btn-forgot-pin-div"><button type="button" style="font-size:var(--xs); color:var(--pri); font-weight:500;" onclick="startForgotPin()" data-i18n="forgot_pin">Forgot PIN?</button></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Reset Password -->
+      <div id="step-reset-pass" style="display:none">
+        <div class="fgrp">
+          <label class="fl" data-i18n="reset_password">Reset Password</label>
+          <div style="position:relative; display:flex; align-items:center;">
+            <input class="fi" id="a-new-pass" type="password" placeholder="Minimum 8 characters" minlength="8" style="padding-right: 40px;" data-i18n="enter_new_password">
+            <button type="button" tabindex="-1" onclick="togglePassword('a-new-pass', 'eye-new-pass')" style="position:absolute; right:10px; color:var(--mut); display:flex; align-items:center; justify-content:center;"><i id="eye-new-pass" data-lucide="eye" style="width:18px;height:18px;"></i></button>
+          </div>
+          <div class="fgrp" style="margin-top:var(--s1)">
+            <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">⚠️ Must contain an uppercase letter and a number.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fa">
+        <button type="button" class="btn bg" onclick="document.getElementById('m-auth').classList.add('hide')" data-i18n="cancel">Cancel</button>
+        <button type="submit" class="btn bp" id="auth-btn"><i data-lucide="log-in"></i><span id="auth-btxt" data-i18n="login">Login</span></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+    Fin<span>Track</span>
+  </a>
+  <div class="nav-r">
+    <button class="theme-btn" onclick="toggleLanguage()" title="Switch Language" style="display:flex;align-items:center;gap:4px">
+      <i data-lucide="globe" style="width:18px;height:18px"></i> <span style="font-size:12px;font-weight:bold" id="lang-ind">EN</span>
+    </button>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle Theme"><i id="thm-ic" data-lucide="moon" style="width:18px;height:18px;display:block"></i></button>
+    <button class="btn bg" onclick="openAuth('login')" data-i18n="login">Login</button>
+    <button class="btn bp" onclick="openAuth('register')" data-i18n="sign_up_free">Sign Up Free</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge"><i data-lucide="shield-check" style="width:12px;height:12px"></i><span data-i18n="hero_badge">Free &amp; Secure</span></div>
+  <h1 data-i18n="hero_title">Manage <span>Finances</span><br>Smarter</h1>
+  <p class="sub" data-i18n="hero_sub">Track income, expenses, accounts, and financial projections in one place. Synced across all devices.</p>
+  <div class="ctas">
+    <button class="btn bp btnlg" onclick="openAuth('register')"><i data-lucide="rocket"></i><span data-i18n="hero_cta_start">Get Started — Free</span></button>
+    <button class="btn bg btnlg" onclick="openAuth('login')"><i data-lucide="log-in"></i><span data-i18n="hero_cta_login">Already have an account</span></button>
+  </div>
+</section>
+
+<section class="feats">
+  <h2 class="ft" data-i18n="feat_title">Everything you need</h2>
+  <p class="fs" data-i18n="feat_sub">Complete features for organized personal financial management</p>
+  <div class="fg2">
+    <div class="fc"><div class="fic" style="background:var(--prhl);color:var(--pri)"><i data-lucide="wallet"></i></div><div class="fn" data-i18n="f1_t">Multi Accounts &amp; Wallets</div><div class="fd" data-i18n="f1_s">Manage bank, e-wallets, and cash in one neat dashboard.</div></div>
+    <div class="fc"><div class="fic" style="background:var(--suchl);color:var(--suc)"><i data-lucide="trending-up"></i></div><div class="fn" data-i18n="f2_t">Financial Projections</div><div class="fd" data-i18n="f2_s">Estimate end-of-month balance based on routine income and expenses.</div></div>
+    <div class="fc"><div class="fic" style="background:var(--gldhl);color:var(--gld)"><i data-lucide="repeat"></i></div><div class="fn" data-i18n="f3_t">Recurring Transactions</div><div class="fd" data-i18n="f3_s">Set up installments or subscriptions once, calculated automatically every period.</div></div>
+    <div class="fc"><div class="fic" style="background:var(--bluhl);color:var(--blu)"><i data-lucide="bar-chart-2"></i></div><div class="fn" data-i18n="f4_t">Visual Reports</div><div class="fd" data-i18n="f4_s">Analyze expenses by category and account briefly.</div></div>
+    <div class="fc"><div class="fic" style="background:var(--purhl);color:var(--pur)"><i data-lucide="smartphone"></i></div><div class="fn" data-i18n="f5_t">Multi Device Access</div><div class="fd" data-i18n="f5_s">Data stored in the cloud, access from phone, laptop, or tablet anytime.</div></div>
+    <div class="fc"><div class="fic" style="background:var(--orahl);color:var(--ora)"><i data-lucide="shield"></i></div><div class="fn" data-i18n="f6_t">Secure &amp; Encrypted</div><div class="fd" data-i18n="f6_s">Passwords are hashed with bcrypt. Your data cannot be accessed by others.</div></div>
+  </div>
+</section>
+
+<footer data-i18n="footer">© 2026 FinTrack &nbsp;·&nbsp; Made with ❤️ for better organized finances</footer>
+
+<script src="i18n.js"></script>
+<script>
+var API = ''; // Same domain — frontend & backend served from same Vercel deployment
+
+function togglePassword(inputId, iconId) {
+  var input = document.getElementById(inputId);
+  var icon = document.getElementById(iconId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.setAttribute('data-lucide', 'eye-off');
+  } else {
+    input.type = 'password';
+    icon.setAttribute('data-lucide', 'eye');
+  }
+  lucide.createIcons();
+}
+
+function toggleTheme(){
+  var t = document.documentElement.getAttribute('data-theme');
+  var next = t === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('thm-ic').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
+  lucide.createIcons();
+}
+function openAuth(mode) {
+  switchTab(mode);
+  document.getElementById('m-auth').classList.remove('hide');
+  setTimeout(function(){ lucide.createIcons(); }, 50);
+}
+var tempToken = null;
+
+function switchTab(mode) {
+  var isLogin = mode === 'login';
+  document.getElementById('tab-in').classList.toggle('on', isLogin);
+  document.getElementById('tab-reg').classList.toggle('on', !isLogin);
+  document.getElementById('auth-ttl').setAttribute('data-i18n', isLogin ? 'login_title' : 'register_title');
+  document.getElementById('auth-ttl').textContent  = isLogin ? t('login_title') : t('register_title');
+  var btxt = document.getElementById('auth-btxt');
+  if (btxt) {
+    btxt.setAttribute('data-i18n', isLogin ? 'login' : 'register');
+    btxt.textContent = isLogin ? t('login') : t('register');
+  }
+  document.getElementById('pass-hint').style.display = isLogin ? 'none' : '';
+  document.getElementById('auth-err').classList.remove('show');
+  document.getElementById('auth-ok').classList.remove('show');
+  document.getElementById('m-auth').dataset.mode = mode;
+  document.getElementById('grp-pass').style.display = 'block';
+  document.getElementById('btn-forgot-pass-div').style.display = isLogin ? 'block' : 'none';
+  
+  // Reset steps
+  document.getElementById('step-1').style.display = 'block';
+  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('step-pin').style.display = 'none';
+  document.getElementById('step-reset-pass').style.display = 'none';
+  document.getElementById('a-email').required = true;
+  document.getElementById('a-pass').required = true;
+  document.getElementById('a-otp').required = false;
+  document.getElementById('a-pin').required = false;
+  document.getElementById('a-new-pass').required = false;
+  document.getElementById('a-otp').value = '';
+  document.getElementById('a-pin').value = '';
+  document.getElementById('a-new-pass').value = '';
+  
+  document.getElementById('a-pass').type = 'password';
+  document.getElementById('eye-pass').setAttribute('data-lucide', 'eye');
+  document.getElementById('a-pin').type = 'password';
+  document.getElementById('eye-pin').setAttribute('data-lucide', 'eye');
+  if(document.getElementById('a-new-pass')) {
+    document.getElementById('a-new-pass').type = 'password';
+    document.getElementById('eye-new-pass').setAttribute('data-lucide', 'eye');
+  }
+  
+  tempToken = null;
+  lucide.createIcons();
+}
+
+function startForgotPass() {
+  var errEl = document.getElementById('auth-err');
+  var okEl  = document.getElementById('auth-ok');
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+  document.getElementById('m-auth').dataset.mode = 'forgot-pass';
+  document.getElementById('grp-pass').style.display = 'none';
+  document.getElementById('a-pass').required = false;
+  document.getElementById('auth-ttl').textContent = t('reset_password');
+  document.getElementById('auth-btxt').textContent = t('send_otp');
+  lucide.createIcons();
+}
+
+function startForgotPin() {
+  document.getElementById('m-auth').dataset.mode = 'forgot-pin';
+  document.getElementById('a-pin').required = false;
+  document.getElementById('auth-btn').click();
+}
+function setStep(step, desc) {
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('step-pin').style.display = 'none';
+  document.getElementById('step-reset-pass').style.display = 'none';
+  
+  document.getElementById('a-email').required = false;
+  document.getElementById('a-pass').required = false;
+  document.getElementById('a-otp').required = false;
+  document.getElementById('a-pin').required = false;
+  document.getElementById('a-new-pass').required = false;
+  
+  if (step === 'otp') {
+    document.getElementById('step-otp').style.display = 'block';
+    document.getElementById('a-otp').required = true;
+    document.getElementById('auth-btxt').textContent = t('verify_otp');
+    document.getElementById('m-auth').dataset.mode = 'verify-otp';
+  } else if (step === 'otp-reset-pass') {
+    document.getElementById('step-otp').style.display = 'block';
+    document.getElementById('a-otp').required = true;
+    document.getElementById('auth-btxt').textContent = t('verify_otp');
+    document.getElementById('m-auth').dataset.mode = 'verify-reset-otp';
+  } else if (step === 'otp-reset-pin') {
+    document.getElementById('step-otp').style.display = 'block';
+    document.getElementById('a-otp').required = true;
+    document.getElementById('auth-btxt').textContent = t('verify_otp');
+    document.getElementById('m-auth').dataset.mode = 'verify-pin-otp';
+  } else if (step === 'set-pin') {
+    document.getElementById('step-pin').style.display = 'block';
+    document.getElementById('a-pin').required = true;
+    document.getElementById('pin-desc').textContent = t('pin_setup_msg');
+    document.getElementById('auth-btxt').textContent = t('save_pin');
+    document.getElementById('btn-forgot-pin-div').style.display = 'none';
+    document.getElementById('m-auth').dataset.mode = 'set-pin';
+  } else if (step === 'verify-pin') {
+    document.getElementById('step-pin').style.display = 'block';
+    document.getElementById('a-pin').required = true;
+    document.getElementById('pin-desc').textContent = t('pin_verify_msg');
+    document.getElementById('auth-btxt').textContent = t('verify_pin');
+    document.getElementById('btn-forgot-pin-div').style.display = 'block';
+    document.getElementById('m-auth').dataset.mode = 'verify-pin';
+  } else if (step === 'reset-pass') {
+    document.getElementById('step-reset-pass').style.display = 'block';
+    document.getElementById('a-new-pass').required = true;
+    document.getElementById('auth-btxt').textContent = t('reset_password');
+    document.getElementById('m-auth').dataset.mode = 'reset-pass';
+  }
+}
+
+// Add event listener to update the lang-ind indicator
+window.addEventListener('languageChanged', function() {
+  document.getElementById('lang-ind').textContent = currentLang.toUpperCase();
+});
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('lang-ind').textContent = currentLang.toUpperCase();
+});
+
+async function submitAuth(e) {
+  e.preventDefault();
+  var mode  = document.getElementById('m-auth').dataset.mode || 'login';
+  var btn   = document.getElementById('auth-btn');
+  var errEl = document.getElementById('auth-err');
+  var okEl  = document.getElementById('auth-ok');
+  
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+  var origText = document.getElementById('auth-btxt').textContent;
+  btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i><span id="auth-btxt">'+t('processing')+'</span>'; lucide.createIcons();
+  
+  try {
+    var payload = {};
+    if (mode === 'login' || mode === 'register') {
+      payload = { email: document.getElementById('a-email').value.trim(), password: document.getElementById('a-pass').value };
+    } else if (mode === 'forgot-pass') {
+      payload = { email: document.getElementById('a-email').value.trim() };
+    } else if (mode === 'verify-otp' || mode === 'verify-reset-otp' || mode === 'verify-pin-otp') {
+      payload = { temp_token: tempToken, otp_code: document.getElementById('a-otp').value };
+    } else if (mode === 'reset-pass') {
+      payload = { temp_token: tempToken, password: document.getElementById('a-new-pass').value };
+    } else if (mode === 'set-pin' || mode === 'verify-pin') {
+      payload = { temp_token: tempToken, pin: document.getElementById('a-pin').value };
+    } else if (mode === 'forgot-pin') {
+      payload = { temp_token: tempToken };
+    }
+
+    var url = '/api/auth/' + mode;
+    if (mode === 'forgot-pass') url = '/api/auth/forgot-password';
+    if (mode === 'reset-pass') url = '/api/auth/reset-password';
+    
+    var res  = await fetch(API + url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    var data = await res.json();
+    
+    // Check if OTP/PIN flow needed (403 for not verified)
+    if (res.status === 403 && data.requires_otp) {
+      tempToken = data.temp_token;
+      setStep('otp');
+      throw new Error(data.error);
+    }
+    
+    if (!res.ok) throw new Error(data.error || t('err_occurred'));
+    
+    if (mode === 'register') {
+      tempToken = data.temp_token;
+      setStep('otp');
+      okEl.textContent = t('reg_success');
+      okEl.classList.add('show');
+    } else if (mode === 'forgot-pass') {
+      tempToken = data.temp_token;
+      setStep('otp-reset-pass');
+      okEl.textContent = t('reg_success');
+      okEl.classList.add('show');
+    } else if (mode === 'forgot-pin') {
+      tempToken = data.temp_token;
+      setStep('otp-reset-pin');
+      okEl.textContent = t('reg_success');
+      okEl.classList.add('show');
+    } else if (mode === 'verify-otp') {
+      tempToken = data.temp_token;
+      setStep('set-pin');
+      okEl.textContent = t('email_verified');
+      okEl.classList.add('show');
+    } else if (mode === 'verify-reset-otp') {
+      tempToken = data.temp_token;
+      setStep('reset-pass');
+    } else if (mode === 'verify-pin-otp') {
+      tempToken = data.temp_token;
+      setStep('set-pin');
+    } else if (mode === 'reset-pass') {
+      okEl.textContent = t('pass_reset_success');
+      okEl.classList.add('show');
+      setTimeout(() => switchTab('login'), 2000);
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="log-in"></i><span id="auth-btxt">' + t('login') + '</span>';
+      lucide.createIcons();
+      return;
+    } else if (mode === 'login') {
+      tempToken = data.temp_token;
+      if (data.requires_set_pin) setStep('set-pin');
+      else setStep('verify-pin');
+    } else if (mode === 'set-pin' || mode === 'verify-pin') {
+      localStorage.setItem('ft_token', data.token);
+      localStorage.setItem('ft_user', JSON.stringify(data.user));
+      window.location.href = 'app.html';
+    }
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+  btn.disabled = false;
+  var currentText = document.getElementById('auth-btxt').textContent;
+  if (currentText === t('processing')) {
+     currentText = origText;
+  }
+  btn.innerHTML = '<i data-lucide="log-in"></i><span id="auth-btxt">' + currentText + '</span>';
+  lucide.createIcons();
+}
+(function(){
+  if (localStorage.getItem('ft_token')) window.location.href = 'app.html';
+  lucide.createIcons();
+})();
+</script>
+</body>
+</html>
