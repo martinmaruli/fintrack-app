@@ -21,12 +21,12 @@ const translations = {
     pin_verify_msg: "Enter your 6-digit security PIN.",
     save_pin: "Save PIN",
     verify_pin: "Verify PIN",
-    
+
     // Auth Messages
     err_occurred: "An error occurred.",
     reg_success: "OTP has been sent to your email.",
     email_verified: "Email verified. Please create a PIN.",
-    
+
     // Landing Page
     hero_badge: "Free & Secure",
     hero_title: "Manage <span>Finances</span><br>Smarter",
@@ -66,7 +66,7 @@ const translations = {
     actual_income: "Actual Income",
     actual_expense: "Actual Expense",
     total_balance_acc: "Total Balance Account",
-    
+
     // Sidebar
     nav_dashboard: "Dashboard",
     nav_transaction: "Transaction",
@@ -78,7 +78,7 @@ const translations = {
     nav_proj_in: "Projected Income",
     nav_proj_out: "Projected Outcome",
     nav_report: "Report",
-    
+
     // Headers
     dash_desc: "Your financial summary",
     acc_desc: "Manage all your financial accounts",
@@ -91,7 +91,7 @@ const translations = {
     // Views
     recent_trx: "Recent Transactions",
     recent_act: "Recent activity",
-    
+
     // Table Headers & Labels
     desc: "Description",
     account: "Account",
@@ -126,9 +126,19 @@ const translations = {
     inc_by_cat: "Income by Category",
     exp_by_acc: "Expense by Account",
     acc_most_used: "Which account is most used",
+    neraca_proj: "Projection Balance",
+    neraca_desc: "Actual balance + all projections this period",
+
+    // Neraca labels
+    lbl_actual_income: "Actual Income",
+    lbl_actual_expense: "Actual Expense",
+    lbl_total_balance: "Total Balance",
+    lbl_proj_income: "Projected Income",
+    lbl_proj_expense: "Projected Expense",
 
     // Prompts
     delete_acc_confirm: "Delete account '{name}' and its {count} related transactions?",
+    delete_acc_simple: "Delete account '{name}'?",
     delete_trx_confirm: "Delete this transaction?",
 
     // Periods
@@ -137,7 +147,7 @@ const translations = {
     this_month: "This Month",
     last_month: "Last Month",
     this_year: "This Year",
-    
+
     // Misc
     bank: "Bank",
     ewallet: "E-Wallet",
@@ -153,6 +163,7 @@ const translations = {
     see_all: "See All",
     placeholder_desc: "e.g. Monthly Salary",
     select_account: "— Select account —",
+    no_account_opt: "— No account —",
     placeholder_cat: "Type category...",
     auto_recurrence: "Automatic Recurrence",
     frequency: "Frequency",
@@ -171,15 +182,34 @@ const translations = {
     emoji_icon: "Emoji / Icon",
     one_char: "(1 character)",
     init_balance: "Initial Balance (Rp)",
-    recent_trx: "Recent Transactions",
-    recent_act: "Recent activity",
-    no_trx: "No transactions yet",
     forgot_password: "Forgot Password?",
     forgot_pin: "Forgot PIN?",
     reset_password: "Reset Password",
     enter_new_password: "Enter new password",
     send_otp: "Send OTP",
-    pass_reset_success: "Password successfully reset. Please login."
+    pass_reset_success: "Password successfully reset. Please login.",
+
+    // Toast messages
+    toast_trx_added: "Transaction added",
+    toast_trx_updated: "Updated",
+    toast_trx_deleted: "Deleted",
+    toast_acc_added: "Account added",
+    toast_acc_updated: "Account updated",
+    toast_acc_deleted: "Account deleted",
+    toast_paused: "Paused",
+    toast_resumed: "Resumed",
+    toast_stopped: "Stopped",
+
+    // Account view
+    acc_view_title: "Accounts & Wallets",
+    add_acc_btn: "Add Account",
+    trx_label: "Transactions",
+    once_label: "Once",
+    paused_label: "Paused",
+    stopped_label: "Stopped",
+    next_label: "Next:",
+    this_month_count: "this month",
+    per_month_label: "projected this month",
   },
   id: {
     // Auth & Navigation
@@ -203,7 +233,7 @@ const translations = {
     pin_verify_msg: "Masukkan 6-digit PIN keamanan Anda.",
     save_pin: "Simpan PIN",
     verify_pin: "Verifikasi PIN",
-    
+
     // Auth Messages
     err_occurred: "Terjadi kesalahan.",
     reg_success: "OTP telah dikirim ke email Anda.",
@@ -248,7 +278,7 @@ const translations = {
     actual_income: "Pemasukan Aktual",
     actual_expense: "Pengeluaran Aktual",
     total_balance_acc: "Total Saldo Rekening",
-    
+
     // Sidebar
     nav_dashboard: "Dashboard",
     nav_transaction: "Transaksi",
@@ -260,7 +290,7 @@ const translations = {
     nav_proj_in: "Calon Pemasukan",
     nav_proj_out: "Calon Pengeluaran",
     nav_report: "Laporan",
-    
+
     // Headers
     dash_desc: "Ringkasan keuangan Anda",
     acc_desc: "Kelola semua akun keuangan Anda",
@@ -271,9 +301,9 @@ const translations = {
     rep_desc: "Laporan keuangan lengkap",
 
     // Views
-    recent_trx: "Transaksi Terakhir",
+    recent_trx: "Riwayat Transaksi",
     recent_act: "Aktivitas terbaru",
-    
+
     // Table Headers & Labels
     desc: "Deskripsi",
     account: "Akun",
@@ -308,9 +338,19 @@ const translations = {
     inc_by_cat: "Pemasukan per Kategori",
     exp_by_acc: "Pengeluaran per Akun",
     acc_most_used: "Rekening mana paling banyak digunakan",
+    neraca_proj: "Neraca Proyeksi",
+    neraca_desc: "Saldo aktual + semua proyeksi periode ini",
+
+    // Neraca labels
+    lbl_actual_income: "Pemasukan Aktual",
+    lbl_actual_expense: "Pengeluaran Aktual",
+    lbl_total_balance: "Total Saldo Rekening",
+    lbl_proj_income: "Calon Pemasukan",
+    lbl_proj_expense: "Calon Pengeluaran",
 
     // Prompts
     delete_acc_confirm: "Hapus akun '{name}' beserta {count} transaksi terkait?",
+    delete_acc_simple: "Hapus akun '{name}'?",
     delete_trx_confirm: "Hapus transaksi ini?",
 
     // Periods
@@ -319,7 +359,7 @@ const translations = {
     this_month: "Bulan Ini",
     last_month: "Bulan Lalu",
     this_year: "Tahun Ini",
-    
+
     // Misc
     bank: "Bank",
     ewallet: "E-Wallet",
@@ -335,6 +375,7 @@ const translations = {
     see_all: "Lihat Semua",
     placeholder_desc: "Contoh: Gaji Bulanan",
     select_account: "— Pilih akun —",
+    no_account_opt: "— Tanpa akun —",
     placeholder_cat: "Ketik kategori...",
     auto_recurrence: "Recurrence Otomatis",
     frequency: "Frekuensi",
@@ -353,22 +394,41 @@ const translations = {
     emoji_icon: "Emoji / Ikon",
     one_char: "(1 karakter)",
     init_balance: "Saldo Awal (Rp)",
-    recent_trx: "Riwayat Transaksi",
-    recent_act: "Aktivitas terbaru",
-    no_trx: "Belum ada transaksi",
     forgot_password: "Lupa Password?",
     forgot_pin: "Lupa PIN?",
     reset_password: "Reset Password",
     enter_new_password: "Masukkan password baru",
     send_otp: "Kirim OTP",
-    pass_reset_success: "Password berhasil di-reset. Silakan login."
+    pass_reset_success: "Password berhasil di-reset. Silakan login.",
+
+    // Toast messages
+    toast_trx_added: "Transaksi ditambahkan",
+    toast_trx_updated: "Diperbarui",
+    toast_trx_deleted: "Dihapus",
+    toast_acc_added: "Akun ditambahkan",
+    toast_acc_updated: "Akun diperbarui",
+    toast_acc_deleted: "Akun dihapus",
+    toast_paused: "Di-pause",
+    toast_resumed: "Diaktifkan kembali",
+    toast_stopped: "Dihentikan",
+
+    // Account view
+    acc_view_title: "Rekening & Dompet",
+    add_acc_btn: "Tambah Akun",
+    trx_label: "Transaksi",
+    once_label: "Sekali",
+    paused_label: "Dijeda",
+    stopped_label: "Dihentikan",
+    next_label: "Berikutnya:",
+    this_month_count: "bulan ini",
+    per_month_label: "diproyeksikan bulan ini",
   }
 };
 
 let currentLang = localStorage.getItem('ft_lang') || 'en';
 
 function t(key, vars = {}) {
-  let str = translations[currentLang][key] || key;
+  let str = (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : (translations['en'][key] || key);
   for (const [k, v] of Object.entries(vars)) {
     str = str.replace(`{${k}}`, v);
   }
@@ -390,17 +450,24 @@ function toggleLanguage() {
 function updateDOMTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (translations[currentLang][key]) {
-      if (el.tagName === 'INPUT' && el.type === 'text' || el.type === 'password' || el.type === 'email') {
-        el.placeholder = translations[currentLang][key];
-      } else {
-        // preserve innerHTML tags if they exist in translation
-        el.innerHTML = translations[currentLang][key];
-      }
+    const val = translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : null;
+    if (!val) return;
+
+    const tag = el.tagName;
+    const type = el.type || '';
+
+    if (tag === 'INPUT' && (type === 'text' || type === 'password' || type === 'email' || type === 'number')) {
+      el.placeholder = val;
+    } else if (tag === 'OPTION') {
+      el.textContent = val;
+    } else {
+      // Allows HTML tags inside translation strings (e.g. hero_title has <span>)
+      el.innerHTML = val;
     }
   });
-  // Also update document title if present
-  if (translations[currentLang]['app_title']) {
+
+  // Update document title
+  if (translations[currentLang] && translations[currentLang]['app_title']) {
     document.title = translations[currentLang]['app_title'];
   }
 }
