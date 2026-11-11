@@ -479,7 +479,7 @@ tbody tr:last-child td{border-bottom:none}
           <div class="kc ki"><div class="kl"><i data-lucide="arrow-down-circle"></i><span data-i18n="income">Income</span></div><div class="kv" id="kv-i">Rp 0</div><div class="km" id="km-i">0 <span data-i18n="trx_label">Transactions</span></div></div>
           <div class="kc ke"><div class="kl"><i data-lucide="arrow-up-circle"></i><span data-i18n="expense">Expense</span></div><div class="kv" id="kv-e">Rp 0</div><div class="km" id="km-e">0 <span data-i18n="trx_label">Transactions</span></div></div>
           <div class="kc kb"><div class="kl"><i data-lucide="wallet"></i><span data-i18n="total_balance">Total Balance</span></div><div class="kv" id="kv-b">Rp 0</div><div class="km" data-i18n="all_accounts">All accounts</div></div>
-          <div class="kc kp"><div class="kl"><i data-lucide="calculator"></i><span data-i18n="final_projection">Final Projection</span></div><div class="kv" id="kv-p">Rp 0</div><div class="km" data-i18n="proj_in_out">Projected In − Projected Out</div></div>
+          <div class="kc kp"><div class="kl"><i data-lucide="calculator"></i><span data-i18n="final_projection">Final Projection</span></div><div class="kv" id="kv-p">Rp 0</div><div class="km" id="km-p" data-i18n="proj_in_out">Projected In − Projected Out</div></div>
         </div>
 
         <!-- ACCOUNT MINI CARDS -->
@@ -808,7 +808,7 @@ function accBal(accId) {
   if (!acc) return 0;
   var bal = acc.init;
   for (var i=0;i<DB.length;i++) {
-    if (parseInt(DB[i].accId)===parseInt(accId)) {
+    if (parseInt(DB[i].accId)===parseInt(accId) && (!DB[i].date || DB[i].date<=today)) {
       if (DB[i].type==='income') bal += DB[i].amt;
       else if (DB[i].type==='expense') bal -= DB[i].amt;
     }
@@ -851,40 +851,44 @@ function getFreqLbl(f) {
   return f || '';
 }
 
-function getRange() {
-  if (period==='semua') return {from:'2000-01-01',to:'2099-12-31'};
+function isTrxActive(trx) {
+  var n = trx.note || '';
+  return !n.includes('[PAUSED]') && !n.includes('[STOPPED]');
+}
+function getCurrentMonthRange() {
   var n=new Date(), y=n.getFullYear(), m=n.getMonth();
   var p1 = String(m+1).padStart(2,'0');
   var dTo = String(new Date(y, m+1, 0).getDate()).padStart(2,'0');
   return {from: y + '-' + p1 + '-01', to: y + '-' + p1 + '-' + dTo};
 }
+function getRange() {
+  if (period==='semua') return {from:'2000-01-01',to:today};
+  return getCurrentMonthRange();
+}
 
 function expand(trx, from, to) {
+  if (!isTrxActive(trx)) return [];
   if (!trx.rec) return (trx.date>=from&&trx.date<=to)?[trx]:[];
-  var res=[], cur=trx.date, cnt=0, max=trx.cnt?parseInt(trx.cnt):9999, it=0;
+  var res=[], cur=trx.date, cnt=0, max=trx.cnt?parseInt(trx.cnt,10):9999, it=0;
   while (cur<=to && cnt<max && it++<1000) {
     if (trx.endDate && cur>trx.endDate) break;
-    if (cur>=from) { res.push(Object.assign({},trx,{date:cur,_exp:true})); cnt++; }
+    if (cur>=from) { res.push(Object.assign({},trx,{date:cur,_exp:true})); }
+    cnt++;
     var nxt=addDate(cur,trx.freq); if(nxt<=cur) break; cur=nxt;
   }
   return res;
 }
 
 function getFiltered() {
-  var r=getRange(), out=[];
-  var n=new Date(), y=n.getFullYear(), m=n.getMonth();
-  var eom = y + '-' + String(m+1).padStart(2,'0') + '-' + String(new Date(y, m+1, 0).getDate()).padStart(2,'0');
-  for (var i=0;i<DB.length;i++) {
-    var trx=DB[i], isC=(trx.type==='projected_income'||trx.type==='projected_expense');
+  var r = getRange(), cmRange = getCurrentMonthRange(), out = [];
+  for (var i=0; i<DB.length; i++) {
+    var trx = DB[i], isC = (trx.type==='projected_income'||trx.type==='projected_expense');
     if (isC) {
-      if (period === 'semua') {
-        out.push(trx);
-      } else {
-        var occ=expand(trx,r.from,r.to);
-        for(var j=0;j<occ.length;j++) out.push(occ[j]);
-      }
+      var occ = expand(trx, cmRange.from, cmRange.to);
+      for (var j=0; j<occ.length; j++) out.push(occ[j]);
+    } else if (trx.date >= r.from && trx.date <= r.to) {
+      out.push(trx);
     }
-    else if (trx.date>=r.from&&trx.date<=r.to) out.push(trx);
   }
   return out;
 }
@@ -1289,10 +1293,16 @@ function render(){
     else if(fil[i].type==='projected_expense') ck+=fil[i].amt;
   }
   var bal = getTotalBalance();
-  var proj = bal + cm - ck;
+  var netProj = cm - ck;
+  var proj = bal + netProj;
 
-  setKV('kv-i',mi); setKV('kv-e',me); setKV('kv-b',bal); setKV('kv-p',proj - bal);
+  setKV('kv-i',mi); setKV('kv-e',me); setKV('kv-b',bal); setKV('kv-p',proj);
   setKV('lv-i',mi); setKV('lv-e',me); setKV('lv-b',bal); setKV('lv-p',proj);
+  var kmPEl = document.getElementById('km-p');
+  if (kmPEl) {
+    var sign = netProj >= 0 ? '+' : '-';
+    kmPEl.textContent = t('net_proj_this_month') + ': ' + sign + rpf(Math.abs(netProj));
+  }
   document.getElementById('km-i').textContent = fil.filter(function(x){return x.type==='income';}).length+' '+t('nav_transaction').toLowerCase();
   document.getElementById('km-e').textContent = fil.filter(function(x){return x.type==='expense';}).length+' '+t('nav_transaction').toLowerCase();
   document.getElementById('lbl-cm').textContent = rpf(cm) + ' '+t('nav_proj_in').toLowerCase();
@@ -1316,7 +1326,12 @@ function render(){
 function getTotalBalance(){
   var initBal=0; for(var j=0;j<ACCS.length;j++) initBal+=ACCS[j].init;
   var mi=0,me=0;
-  for(var i=0;i<DB.length;i++){if(DB[i].type==='income')mi+=DB[i].amt;else if(DB[i].type==='expense')me+=DB[i].amt;}
+  for(var i=0;i<DB.length;i++){
+    if(!DB[i].date || DB[i].date<=today){
+      if(DB[i].type==='income')mi+=DB[i].amt;
+      else if(DB[i].type==='expense')me+=DB[i].amt;
+    }
+  }
   return initBal+mi-me;
 }
 
@@ -1328,13 +1343,16 @@ function renderAccCards(containerId, mini){
     el.innerHTML='<div class="es" style="padding:var(--s8);grid-column:1/-1"><i data-lucide="credit-card"></i><h3>'+t('no_accounts')+'</h3><p>'+t('add_acc_first')+'</p></div>';
     return;
   }
+  var r=getRange();
   el.innerHTML=ACCS.map(function(a){
     var bal=accBal(a.id);
     var inAmt=0, outAmt=0;
     for(var i=0;i<DB.length;i++){
       if(DB[i].accId!==a.id) continue;
-      if(DB[i].type==='income') inAmt+=DB[i].amt;
-      else if(DB[i].type==='expense') outAmt+=DB[i].amt;
+      if(DB[i].date>=r.from && DB[i].date<=r.to){
+        if(DB[i].type==='income') inAmt+=DB[i].amt;
+        else if(DB[i].type==='expense') outAmt+=DB[i].amt;
+      }
     }
     var typeCls={bank:'bblu',ewallet:'bpur',cash:'bsuc'}[a.type]||'bpri';
     var balColor=bal>=0?'var(--pri)':'var(--err)';

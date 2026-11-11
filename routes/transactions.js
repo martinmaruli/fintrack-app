@@ -60,21 +60,44 @@ router.get('/', async (req, res) => {
 // New menu-specific API routes
 router.get('/summary', async (req, res) => {
   try {
-    const r = await query(`SELECT type, SUM(amt) as total FROM transactions WHERE user_id = $1 GROUP BY type`, [req.user.id]);
-    const sums = { pemasukan: 0, pengeluaran: 0, calon_pemasukan: 0, calon_pengeluaran: 0 };
+    const now = new Date(Date.now() + 7 * 3600000);
+    const today = now.toISOString().split('T')[0];
+    const y = now.getFullYear(), m = now.getMonth();
+    const cmFrom = y + '-' + String(m + 1).padStart(2, '0') + '-01';
+    const cmTo = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(new Date(y, m + 1, 0).getDate()).padStart(2, '0');
+
+    const r = await query(`SELECT type, amt, date, note FROM transactions WHERE user_id = $1`, [req.user.id]);
+    let income = 0, expense = 0, projected_income = 0, projected_expense = 0;
+
     r.rows.forEach(row => {
       const dt = decryptDeterministic(row.type);
-      sums[dt] = parseFloat(row.total) || 0;
+      const amt = parseFloat(row.amt) || 0;
+      const rowDate = typeof row.date === 'string' ? row.date.split('T')[0] : (row.date ? new Date(row.date).toISOString().split('T')[0] : '');
+      const note = decrypt(row.note) || '';
+
+      if (dt === 'pemasukan') {
+        if (!rowDate || rowDate <= today) income += amt;
+      } else if (dt === 'pengeluaran') {
+        if (!rowDate || rowDate <= today) expense += amt;
+      } else if (dt === 'calon_pemasukan' || dt === 'calon_pengeluaran') {
+        const isStopped = note.includes('[PAUSED]') || note.includes('[STOPPED]');
+        if (!isStopped && rowDate >= cmFrom && rowDate <= cmTo) {
+          if (dt === 'calon_pemasukan') projected_income += amt;
+          else projected_expense += amt;
+        }
+      }
     });
+
     const accR = await query(`SELECT SUM(init) as total_init FROM accounts WHERE user_id = $1`, [req.user.id]);
     const initBal = parseFloat(accR.rows[0]?.total_init) || 0;
+    const balance = initBal + income - expense;
     res.json({
-      income: sums.pemasukan,
-      expense: sums.pengeluaran,
-      projected_income: sums.calon_pemasukan,
-      projected_expense: sums.calon_pengeluaran,
-      balance: initBal + sums.pemasukan - sums.pengeluaran,
-      projected_balance: (initBal + sums.pemasukan - sums.pengeluaran) + sums.calon_pemasukan - sums.calon_pengeluaran
+      income,
+      expense,
+      projected_income,
+      projected_expense,
+      balance,
+      projected_balance: balance + projected_income - projected_expense
     });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Gagal memuat summary.' }); }
 });
