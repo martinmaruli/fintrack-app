@@ -841,6 +841,41 @@ var CAT_KEYS = {
 };
 function normCat(c) { return CAT_ALIASES[c] || c; }
 function tCat(c) { if (!c) return ''; var norm = normCat(c); var k = CAT_KEYS[norm]; return k ? t(k) : c; }
+function rememberCustomCat(c) {
+  if (!c || c === 'custom') return;
+  try {
+    var saved = JSON.parse(localStorage.getItem('ft_custom_cats') || '[]');
+    if (!saved.includes(c)) {
+      saved.push(c);
+      localStorage.setItem('ft_custom_cats', JSON.stringify(saved));
+    }
+  } catch(e) {}
+}
+function getCustomCats(isPem) {
+  var defCats = isPem 
+    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+  var customSet = [];
+  function add(c) {
+    if (!c || typeof c !== 'string') return;
+    c = c.trim();
+    if (!c || c.toLowerCase() === 'custom') return;
+    var norm = normCat(c);
+    if (!defCats.includes(norm) && !customSet.includes(c)) {
+      customSet.push(c);
+    }
+  }
+  for (var i = 0; i < DB.length; i++) {
+    var t = DB[i];
+    var isTrxPem = t.type === 'income' || t.type === 'projected_income';
+    if (isTrxPem === isPem && t.cat) add(t.cat);
+  }
+  try {
+    var saved = JSON.parse(localStorage.getItem('ft_custom_cats') || '[]');
+    saved.forEach(add);
+  } catch(e) {}
+  return customSet;
+}
 function formatCurr(el) {
   var raw = el.value;
   // Remember if user is typing a decimal comma at the end
@@ -909,11 +944,12 @@ function editTrx(id) {
   
   var isPem = trx.type==='income'||trx.type==='projected_income';
   var norm = normCat(trx.cat);
-  var cats = isPem 
+  var defCats = isPem 
     ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
     : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
-  if (cats.includes(norm)) {
-    document.getElementById('f-cat').value=norm;
+  var allCats = defCats.concat(getCustomCats(isPem));
+  if (allCats.includes(norm) || allCats.includes(trx.cat)) {
+    document.getElementById('f-cat').value = allCats.includes(norm) ? norm : trx.cat;
     document.getElementById('f-custom-cat').value='';
   } else {
     document.getElementById('f-cat').value='custom';
@@ -973,7 +1009,10 @@ document.getElementById('form-trx').addEventListener('submit', async function(e)
   var finalFreq = isRec ? (freqVal === 'custom' && customDays ? 'custom_' + customDays : freqVal) : null;
     
   var catVal = document.getElementById('f-cat').value;
-  if (catVal === 'custom') catVal = document.getElementById('f-custom-cat').value.trim() || 'Lainnya';
+  if (catVal === 'custom') {
+    catVal = document.getElementById('f-custom-cat').value.trim() || 'Other';
+    rememberCustomCat(catVal);
+  }
     
   var data={
     desc:document.getElementById('f-desc').value.trim(),
@@ -1126,13 +1165,35 @@ function onTypeChange() {
   var prev = sel.value;
   var isPem = v==='income'||v==='projected_income';
   var norm = normCat(prev);
-  var cats = isPem 
+  var defCats = isPem 
     ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
     : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
-  sel.innerHTML = cats.map(function(c){return '<option value="'+c+'">'+tCat(c)+'</option>';}).join('') + '<option value="custom">'+t('custom_cat')+'</option>';
-  if (cats.includes(norm) || prev === 'custom') sel.value = norm;
-  else sel.value = cats[0];
+  var customCats = getCustomCats(isPem);
   
+  var opts = defCats.map(function(c){
+    return '<option value="'+c+'">'+tCat(c)+'</option>';
+  });
+
+  if (customCats.length > 0) {
+    opts.push('<option disabled>──────────</option>');
+    customCats.forEach(function(c){
+      opts.push('<option value="'+esc(c)+'">'+esc(c)+'</option>');
+    });
+  }
+
+  opts.push('<option value="custom">'+t('custom_cat')+'</option>');
+  sel.innerHTML = opts.join('');
+
+  var allCats = defCats.concat(customCats);
+  if (allCats.includes(norm)) {
+    sel.value = norm;
+  } else if (allCats.includes(prev)) {
+    sel.value = prev;
+  } else if (prev === 'custom') {
+    sel.value = 'custom';
+  } else {
+    sel.value = defCats[0];
+  }
   var dateInput = document.getElementById('f-date');
   if (v === 'income' || v === 'expense') {
     dateInput.max = today;
@@ -1659,7 +1720,7 @@ function doLogout(auto) {
   if (window.lucide) lucide.createIcons();
 }
 function confirmLogout() {
-  ['ft_token','ft_user','ft_db','ft_accs'].forEach(function(k){ localStorage.removeItem(k); });
+  ['ft_token','ft_user','ft_db','ft_accs','ft_custom_cats'].forEach(function(k){ localStorage.removeItem(k); });
   window.location.href = '/home';
 }
 function setUserUI() {
