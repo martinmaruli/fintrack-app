@@ -217,6 +217,8 @@ const translations = {
     toast_stopped: "Stopped",
     toast_trx_realized: "Projection realized into actual transaction",
     toast_save_failed: "Failed to save to database",
+    fill_this_field: "Please fill out this field.",
+    err_amount_zero: "Amount must be greater than 0.",
     realize_btn: "Mark Realized",
     // Account view
     acc_view_title: "Accounts & Wallets",
@@ -449,6 +451,8 @@ const translations = {
     toast_stopped: "Dihentikan",
     toast_trx_realized: "Proyeksi direalisasikan ke transaksi aktual",
     toast_save_failed: "Gagal menyimpan ke database",
+    fill_this_field: "Mohon isi bidang ini.",
+    err_amount_zero: "Jumlah harus lebih besar dari 0.",
     realize_btn: "Realisasikan",
     // Account view
     acc_view_title: "Rekening & Dompet",
@@ -513,6 +517,28 @@ function updateDOMTranslations() {
   if (typeof lucide !== 'undefined' && lucide.createIcons) {
     lucide.createIcons();
   }
+  applyFormValidationTranslations();
+}
+function applyFormValidationTranslations() {
+  document.querySelectorAll('input, select, textarea').forEach(function(el) {
+    if (!el._hasValidationHandler) {
+      el._hasValidationHandler = true;
+      el.addEventListener('invalid', function(e) {
+        e.target.setCustomValidity('');
+        if (!e.target.validity.valid) {
+          if (e.target.validity.valueMissing) {
+            e.target.setCustomValidity(t('fill_this_field'));
+          }
+        }
+      });
+      el.addEventListener('input', function(e) {
+        e.target.setCustomValidity('');
+      });
+      el.addEventListener('change', function(e) {
+        e.target.setCustomValidity('');
+      });
+    }
+  });
 }
 
 // Initial update on load

@@ -1170,8 +1170,26 @@ document.getElementById('form-trx').addEventListener('submit', async function(e)
     cnt:isRec?(document.getElementById('f-cnt').value||null):null,
     endDate:isRec?(document.getElementById('f-end').value||null):null
   };
-  if (!data.desc||!data.amt||!data.date) {
+  if (!data.desc) {
     if (sbtn) sbtn.disabled = false;
+    var dEl = document.getElementById('f-desc');
+    dEl.setCustomValidity(t('fill_this_field'));
+    dEl.reportValidity();
+    return;
+  }
+  if (!data.amt || data.amt <= 0) {
+    if (sbtn) sbtn.disabled = false;
+    var aEl = document.getElementById('f-amt');
+    aEl.setCustomValidity(t('err_amount_zero'));
+    aEl.reportValidity();
+    toast(t('err_amount_zero'), 'er');
+    return;
+  }
+  if (!data.date) {
+    if (sbtn) sbtn.disabled = false;
+    var dtEl = document.getElementById('f-date');
+    dtEl.setCustomValidity(t('fill_this_field'));
+    dtEl.reportValidity();
     return;
   }
   if (id) {
@@ -1272,6 +1290,9 @@ document.getElementById('form-acc').addEventListener('submit', async function(e)
   };
   if(!data.name) {
     if (sbtn) sbtn.disabled = false;
+    var nameEl = document.getElementById('a-name');
+    nameEl.setCustomValidity(t('fill_this_field'));
+    nameEl.reportValidity();
     return;
   }
   if(id){
