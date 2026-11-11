@@ -143,13 +143,6 @@ tbody tr:last-child td{border-bottom:none}
 .ta{font-weight:600;font-variant-numeric:tabular-nums lining-nums}
 .ti{color:var(--suc)}.te{color:var(--err)}.tci{color:var(--gld)}.tce{color:var(--ora)}
 
-/* TRANSACTION QUICK TABS */
-.tx-nav-tabs{display:flex;gap:var(--s2);overflow-x:auto;padding-bottom:var(--s2);margin-bottom:var(--s3);scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.tx-nav-tabs::-webkit-scrollbar{display:none}
-.tx-tab{display:inline-flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);border-radius:var(--rfl);font-size:var(--xs);font-weight:600;background:var(--off);color:var(--mut);border:1px solid var(--bor);transition:all var(--tr);white-space:nowrap;cursor:pointer;min-height:36px}
-.tx-tab:hover{background:var(--sur2);color:var(--txt)}
-.tx-tab.on{background:var(--prhl);color:var(--pri);border-color:rgba(56,189,248,.35)}
-.tx-tab i{width:14px;height:14px}
 
 /* MODAL */
 .mb{position:fixed;inset:0;z-index:100;background:rgba(4,6,10,.65);display:flex;align-items:center;justify-content:center;padding:var(--s4);backdrop-filter:blur(28px) saturate(190%);-webkit-backdrop-filter:blur(28px) saturate(190%);transition:opacity var(--tr)}
@@ -427,18 +420,18 @@ tbody tr:last-child td{border-bottom:none}
       </div>
       <span class="ltx">Fin<span>Track</span></span>
     </div>
-    <button type="button" class="nit on" onclick="gv('dashboard',this)"><i data-lucide="layout-dashboard"></i><span data-i18n="nav_dashboard">Dashboard</span></button>
+    <button type="button" class="nit on" data-nav="dashboard" onclick="gv('dashboard',this)"><i data-lucide="layout-dashboard"></i><span data-i18n="nav_dashboard">Dashboard</span></button>
     
     <button type="button" class="nit" onclick="toggleSubmenu('tx-sub')"><i data-lucide="list"></i><span style="flex:1" data-i18n="nav_transaction">Transaction</span><i data-lucide="chevron-down" id="tx-chevron" style="width:16px;height:16px"></i></button>
     <div id="tx-sub" style="display:none;flex-direction:column;padding-left:var(--s4);gap:2px">
-      <button type="button" class="nit" onclick="gv('akun',this)"><i data-lucide="credit-card"></i><span data-i18n="nav_accounts">Bank &amp; Wallet</span></button>
-      <button type="button" class="nit" onclick="gv('income',this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
-      <button type="button" class="nit" onclick="gv('expense',this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
-      <button type="button" class="nit" onclick="gv('cp',this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
-      <button type="button" class="nit" onclick="gv('ck',this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
+      <button type="button" class="nit" data-nav="akun" onclick="gv('akun',this)"><i data-lucide="credit-card"></i><span data-i18n="nav_accounts">Bank &amp; Wallet</span></button>
+      <button type="button" class="nit" data-nav="income" onclick="gv('income',this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
+      <button type="button" class="nit" data-nav="expense" onclick="gv('expense',this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
+      <button type="button" class="nit" data-nav="cp" onclick="gv('cp',this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
+      <button type="button" class="nit" data-nav="ck" onclick="gv('ck',this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
     </div>
 
-    <button type="button" class="nit" onclick="gv('laporan',this)"><i data-lucide="bar-chart-2"></i><span data-i18n="nav_report">Report</span></button>
+    <button type="button" class="nit" data-nav="laporan" onclick="gv('laporan',this)"><i data-lucide="bar-chart-2"></i><span data-i18n="nav_report">Report</span></button>
     <div class="sb-foot">
       <button type="button" class="nit" onclick="doExport()"><i data-lucide="download"></i><span>Export CSV</span></button>
       <div id="sb-profile" style="display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s2);border-top:1px solid var(--div);margin-top:var(--s2)">
@@ -493,17 +486,17 @@ tbody tr:last-child td{border-bottom:none}
 
         <div class="g2">
           <div class="card">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" id="lbl-cm">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bgld"><i data-lucide="trending-up"></i><span data-i18n="projection">Projection</span></span></div>
+            <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" id="lbl-cm">Rp 0 <span data-i18n="projected">projected</span></div></div><div style="display:flex;align-items:center;gap:var(--s2)"><button class="btn bg bsm" onclick="gv('cp')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button><span class="badge bgld"><i data-lucide="trending-up"></i><span data-i18n="projection">Projection</span></span></div></div>
             <div id="prev-cm"></div>
           </div>
           <div class="card">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" id="lbl-ck">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bora"><i data-lucide="trending-down"></i><span data-i18n="projection">Projection</span></span></div>
+            <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" id="lbl-ck">Rp 0 <span data-i18n="projected">projected</span></div></div><div style="display:flex;align-items:center;gap:var(--s2)"><button class="btn bg bsm" onclick="gv('ck')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button><span class="badge bora"><i data-lucide="trending-down"></i><span data-i18n="projection">Projection</span></span></div></div>
             <div id="prev-ck"></div>
           </div>
         </div>
 
         <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div></div>
+          <div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div><button class="btn bg bsm" onclick="gv('income')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th><th style="text-align:right">Amount</th></tr></thead><tbody id="tb-dash"></tbody></table></div>
         </div>
       </div>
@@ -528,12 +521,6 @@ tbody tr:last-child td{border-bottom:none}
 
       <!-- PEMASUKAN -->
       <div class="view" id="view-income">
-        <div class="tx-nav-tabs">
-          <button class="tx-tab on" data-target="income" onclick="gv('income', this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
-          <button class="tx-tab" data-target="expense" onclick="gv('expense', this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
-          <button class="tx-tab" data-target="cp" onclick="gv('cp', this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
-          <button class="tx-tab" data-target="ck" onclick="gv('ck', this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
-        </div>
         <div class="card">
           <div class="ch"><div><div class="ct" data-i18n="nav_income">Income</div><div class="cs" data-i18n="inc_desc">Income that has been received</div></div><button class="btn bp bsm" onclick="openModalAs('income')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="date">Date</th><th data-i18n="note">Note</th><th style="text-align:right">Amount</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-i"></tbody></table></div>
@@ -542,12 +529,6 @@ tbody tr:last-child td{border-bottom:none}
 
       <!-- PENGELUARAN -->
       <div class="view" id="view-expense">
-        <div class="tx-nav-tabs">
-          <button class="tx-tab" data-target="income" onclick="gv('income', this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
-          <button class="tx-tab on" data-target="expense" onclick="gv('expense', this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
-          <button class="tx-tab" data-target="cp" onclick="gv('cp', this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
-          <button class="tx-tab" data-target="ck" onclick="gv('ck', this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
-        </div>
         <div class="card">
           <div class="ch"><div><div class="ct" data-i18n="nav_outcome">Expense</div><div class="cs" data-i18n="out_desc">Expenses that have occurred</div></div><button class="btn bp bsm" onclick="openModalAs('expense')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="date">Date</th><th data-i18n="note">Note</th><th style="text-align:right">Amount</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-e"></tbody></table></div>
@@ -556,12 +537,6 @@ tbody tr:last-child td{border-bottom:none}
 
       <!-- CALON PEMASUKAN -->
       <div class="view" id="view-cp">
-        <div class="tx-nav-tabs">
-          <button class="tx-tab" data-target="income" onclick="gv('income', this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
-          <button class="tx-tab" data-target="expense" onclick="gv('expense', this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
-          <button class="tx-tab on" data-target="cp" onclick="gv('cp', this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
-          <button class="tx-tab" data-target="ck" onclick="gv('ck', this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
-        </div>
         <div class="card">
           <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" data-i18n="pi_desc">Income template: can repeat automatically</div></div><button class="btn bp bsm" onclick="openModalAs('projected_income')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="category">Category</th><th data-i18n="account">Account</th><th data-i18n="recurrence">Recurrence</th><th data-i18n="start">Start</th><th data-i18n="limit">Limit</th><th data-i18n="note">Note</th><th style="text-align:right" data-i18n="per_period">Per Period</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-cp"></tbody></table></div>
@@ -570,12 +545,6 @@ tbody tr:last-child td{border-bottom:none}
 
       <!-- CALON PENGELUARAN -->
       <div class="view" id="view-ck">
-        <div class="tx-nav-tabs">
-          <button class="tx-tab" data-target="income" onclick="gv('income', this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
-          <button class="tx-tab" data-target="expense" onclick="gv('expense', this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
-          <button class="tx-tab" data-target="cp" onclick="gv('cp', this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
-          <button class="tx-tab on" data-target="ck" onclick="gv('ck', this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
-        </div>
         <div class="card">
           <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" data-i18n="po_desc">Subscriptions, installments, debt: can repeat automatically</div></div><button class="btn bp bsm" onclick="openModalAs('projected_expense')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="category">Category</th><th data-i18n="account">Account</th><th data-i18n="recurrence">Recurrence</th><th data-i18n="start">Start</th><th data-i18n="limit">Limit</th><th data-i18n="note">Note</th><th style="text-align:right" data-i18n="per_period">Per Period</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-ck"></tbody></table></div>
@@ -1559,11 +1528,16 @@ function gv(v,el){
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on');});
   document.querySelectorAll('.nit').forEach(function(x){x.classList.remove('on');});
   document.querySelectorAll('.mob-nit').forEach(function(x){x.classList.remove('on');});
-  document.querySelectorAll('.tx-tab').forEach(function(x){
-    x.classList.toggle('on', x.getAttribute('data-target') === v);
-  });
   var ve=document.getElementById('view-'+v); if(ve)ve.classList.add('on');
-  if(el && el.classList && el.classList.contains('nit')) el.classList.add('on');
+  var navBtn = document.querySelector('.nit[data-nav="'+v+'"]');
+  if(navBtn) navBtn.classList.add('on');
+  else if(el && el.classList && el.classList.contains('nit')) el.classList.add('on');
+  var txSub = document.getElementById('tx-sub');
+  var chev = document.getElementById('tx-chevron');
+  if(['akun','income','expense','cp','ck'].indexOf(v) !== -1){
+    if(txSub) txSub.style.display = 'flex';
+    if(chev) chev.setAttribute('data-lucide', 'chevron-up');
+  }
   var mobEl = document.querySelector('.mob-nit[data-view="'+v+'"]');
   if(mobEl) mobEl.classList.add('on');
   if(['income','expense','cp','ck'].indexOf(v) !== -1){
