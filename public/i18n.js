@@ -482,6 +482,9 @@ function updateDOMTranslations() {
   if (translations[currentLang] && translations[currentLang]['app_title']) {
     document.title = translations[currentLang]['app_title'];
   }
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    lucide.createIcons();
+  }
 }
 
 // Initial update on load

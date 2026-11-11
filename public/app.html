@@ -1568,9 +1568,9 @@ function doExport(){
       escCsv(t.note || '')
     ].join(',');
   });
-  var csv = [h.join(',')].concat(rows).join('\r\n');
+  var csv = 'sep=,\r\n' + [h.join(',')].concat(rows).join('\r\n');
   var a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
   a.download = 'fintrack_' + today + '.csv';
   a.click();
   toast(t('data_exported'));
