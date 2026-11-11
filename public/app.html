@@ -485,19 +485,28 @@ tbody tr:last-child td{border-bottom:none}
         </div>
 
         <div class="g2">
-          <div class="card">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" id="lbl-cm">Rp 0 <span data-i18n="projected">projected</span></div></div><div style="display:flex;align-items:center;gap:var(--s2)"><button class="btn bg bsm" onclick="gv('cp')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button><span class="badge bgld"><i data-lucide="trending-up"></i><span data-i18n="projection">Projection</span></span></div></div>
-            <div id="prev-cm"></div>
+          <div class="card" style="display:flex;flex-direction:column">
+            <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" id="lbl-cm">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bgld"><i data-lucide="trending-up"></i><span data-i18n="projection">Projection</span></span></div>
+            <div id="prev-cm" style="flex:1"></div>
+            <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:flex-end">
+              <button class="btn bg bsm" onclick="gv('cp')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button>
+            </div>
           </div>
-          <div class="card">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" id="lbl-ck">Rp 0 <span data-i18n="projected">projected</span></div></div><div style="display:flex;align-items:center;gap:var(--s2)"><button class="btn bg bsm" onclick="gv('ck')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button><span class="badge bora"><i data-lucide="trending-down"></i><span data-i18n="projection">Projection</span></span></div></div>
-            <div id="prev-ck"></div>
+          <div class="card" style="display:flex;flex-direction:column">
+            <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" id="lbl-ck">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bora"><i data-lucide="trending-down"></i><span data-i18n="projection">Projection</span></span></div>
+            <div id="prev-ck" style="flex:1"></div>
+            <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:flex-end">
+              <button class="btn bg bsm" onclick="gv('ck')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div><button class="btn bg bsm" onclick="gv('income')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button></div>
+          <div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div></div>
           <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th><th style="text-align:right">Amount</th></tr></thead><tbody id="tb-dash"></tbody></table></div>
+          <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:flex-end">
+            <button class="btn bg bsm" onclick="gv('income')"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button>
+          </div>
         </div>
       </div>
 
