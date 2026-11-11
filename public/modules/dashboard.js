@@ -45,6 +45,8 @@ window.FinTrackModules.dashboard = {
     setKV('kv-e', ctx.me);
     setKV('kv-b', ctx.bal);
     setKV('kv-p', ctx.proj);
+    var kpSpan = document.querySelector('.kc.kp .kl span');
+    if (kpSpan) kpSpan.textContent = period === 'semua' ? t('proj_balance') : t('final_projection');
 
     var kmPEl = document.getElementById('km-p');
     if (kmPEl) {

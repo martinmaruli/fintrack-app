@@ -756,7 +756,7 @@ function getCurrentMonthRange() {
   return {from: y + '-' + p1 + '-01', to: y + '-' + p1 + '-' + dTo};
 }
 function getRange() {
-  if (period==='semua') return {from:'2000-01-01',to:today};
+  if (period==='semua') return {from:'0000-01-01',to:'9999-12-31'};
   return getCurrentMonthRange();
 }
 
@@ -774,14 +774,25 @@ function expand(trx, from, to) {
 }
 
 function getFiltered() {
-  var r = getRange(), cmRange = getCurrentMonthRange(), out = [];
-  for (var i=0; i<DB.length; i++) {
-    var trx = DB[i], isC = (trx.type==='projected_income'||trx.type==='projected_expense');
-    if (isC) {
-      var occ = expand(trx, cmRange.from, cmRange.to);
-      for (var j=0; j<occ.length; j++) out.push(occ[j]);
-    } else if (trx.date >= r.from && trx.date <= r.to) {
-      out.push(trx);
+  var r = getRange(), out = [];
+  if (period === 'semua') {
+    for (var i = 0; i < DB.length; i++) {
+      var trx = DB[i];
+      if (trx.type === 'income' || trx.type === 'expense') {
+        if (trx.date >= r.from && trx.date <= r.to) out.push(trx);
+      } else if (isTrxActive(trx)) {
+        out.push(trx);
+      }
+    }
+  } else {
+    for (var i = 0; i < DB.length; i++) {
+      var trx = DB[i];
+      if (trx.type === 'projected_income' || trx.type === 'projected_expense') {
+        var occ = expand(trx, r.from, r.to);
+        for (var j = 0; j < occ.length; j++) out.push(occ[j]);
+      } else if (trx.date >= r.from && trx.date <= r.to) {
+        out.push(trx);
+      }
     }
   }
   return out;
@@ -797,8 +808,16 @@ function toggleBalance() {
   lucide.createIcons();
   render();
 }
-function rp(n){ if(isBalanceHidden) return 'Rp ••••••'; var neg=n<0,a=Math.abs(n),s='Rp '+a.toLocaleString('id-ID'); return neg?'-'+s:s; }
-function rpf(n){ if(isBalanceHidden) return 'Rp ••••••'; return 'Rp '+Math.abs(n).toLocaleString('id-ID'); }
+function formatRupiah(a) {
+  var rounded = Math.round(a * 100) / 100;
+  var hasDec = (rounded % 1) !== 0;
+  return rounded.toLocaleString('id-ID', {
+    minimumFractionDigits: hasDec ? 2 : 0,
+    maximumFractionDigits: 2
+  });
+}
+function rp(n){ if(isBalanceHidden) return 'Rp ••••••'; var neg=n<0,a=Math.abs(n),s='Rp '+formatRupiah(a); return neg?'-'+s:s; }
+function rpf(n){ if(isBalanceHidden) return 'Rp ••••••'; return 'Rp '+formatRupiah(Math.abs(n)); }
 function fd(s){ 
   if(!s)return'-'; 
   var p=s.split('T')[0].split('-');
@@ -816,7 +835,7 @@ function formatCurr(el) {
   var parts = raw.replace(/[^0-9,]/g, '').split(',');
   if (parts.length > 2) parts = [parts[0], parts[1]];
   var intPart = parts[0] || '';
-  var decPart = parts.length > 1 ? parts[1] : null;
+  var decPart = parts.length > 1 ? parts[1].slice(0, 2) : null;
   if (!intPart && decPart === null) { el.value = ''; return; }
   // Format integer part with dot thousands separator
   intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -830,12 +849,13 @@ function formatCurr(el) {
 }
 function parseCurr(val) {
   if(!val) return 0;
-  // Remove dot thousands separators, replace comma decimal with dot
-  return parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0;
+  var n = parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0;
+  return Math.round(n * 100) / 100;
 }
 function formatAmtForInput(amt) {
-  if (amt == null) return '';
-  var s = String(amt).replace('.', ',');
+  if (amt == null || amt === '') return '';
+  var rounded = Math.round(Number(amt) * 100) / 100;
+  var s = String(rounded).replace('.', ',');
   var p = s.split(',');
   p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return p.join(',');
@@ -1404,8 +1424,8 @@ function renderReport(fil,mi,me,bal,cm,ck,proj){
         +'<div class="pb"><div class="pf" style="width:'+pct+'%;background:'+cols[i%cols.length]+'"></div></div></div>';
     }).join('');
   };
-  rKat('lap-ke',['expense','projected_expense']);
-  rKat('lap-ki',['income','projected_income']);
+  rKat('lap-ke',['expense']);
+  rKat('lap-ki',['income']);
 
   // per-account spending
   var lapAcc=document.getElementById('lap-acc');
@@ -1571,7 +1591,7 @@ function doExport(){
     return [
       t.id,
       escCsv(t.desc),
-      t.amt || 0,
+      Math.round(Number(t.amt || 0) * 100) / 100,
       escCsv(typeMap[t.type] || t.type),
       escCsv(a ? a.name : '-'),
       escCsv(t.cat || '-'),
