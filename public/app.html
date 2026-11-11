@@ -314,7 +314,7 @@ tbody tr:last-child td{border-bottom:none}
           <select class="fs" id="f-cat" onchange="onCatChange()"></select>
         </div>
         <div class="fgrp" id="f-custom-cat-grp" style="display:none">
-          <label class="fl" data-i18n="custom_cat">Category Kustom</label>
+          <label class="fl" data-i18n="custom_cat">Custom Category</label>
           <input class="fi" id="f-custom-cat" placeholder="Type category..." data-i18n="placeholder_cat">
         </div>
         <div class="fgrp">
@@ -450,7 +450,7 @@ tbody tr:last-child td{border-bottom:none}
       <div id="sb-profile" style="display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s2);border-top:1px solid var(--div);margin-top:var(--s2)">
         <div id="sb-avatar" style="width:30px;height:30px;border-radius:var(--rfl);background:var(--prhl);color:var(--pri);display:flex;align-items:center;justify-content:center;font-size:var(--xs);font-weight:700;flex-shrink:0">?</div>
         <div id="sb-email" style="font-size:var(--xs);color:var(--mut);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">-</div>
-        <button class="bic" onclick="doLogout()" title="Keluar"><i data-lucide="log-out" style="width:16px;height:16px;color:var(--err)"></i></button>
+        <button class="bic" onclick="doLogout()" title="Logout" data-i18n-title="logout"><i data-lucide="log-out" style="width:16px;height:16px;color:var(--err)"></i></button>
       </div>
     </div>
   </aside>
@@ -827,6 +827,20 @@ function fd(s){
   return parseInt(p[2])+' '+mm[parseInt(p[1])-1]+' '+p[0]; 
 }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+var CAT_ALIASES = {
+  'Gaji': 'Salary', 'Investasi': 'Investment', 'Bisnis': 'Business', 'Lainnya': 'Other',
+  'Makanan': 'Food', 'Transportasi': 'Transportation', 'Langganan': 'Subscription',
+  'Hutang': 'Debt', 'Tagihan': 'Bills', 'Hiburan': 'Entertainment',
+  'Kesehatan': 'Health', 'Pendidikan': 'Education'
+};
+var CAT_KEYS = {
+  'Salary': 'cat_salary', 'Freelance': 'cat_freelance', 'Investment': 'cat_investment', 'Business': 'cat_business',
+  'Food': 'cat_food', 'Transportation': 'cat_transportation', 'Subscription': 'cat_subscription',
+  'Debt': 'cat_debt', 'Bills': 'cat_bills', 'Entertainment': 'cat_entertainment',
+  'Health': 'cat_health', 'Education': 'cat_education', 'Other': 'cat_other'
+};
+function normCat(c) { return CAT_ALIASES[c] || c; }
+function tCat(c) { if (!c) return ''; var norm = normCat(c); var k = CAT_KEYS[norm]; return k ? t(k) : c; }
 function formatCurr(el) {
   var raw = el.value;
   // Remember if user is typing a decimal comma at the end
@@ -894,9 +908,12 @@ function editTrx(id) {
   onTypeChange();
   
   var isPem = trx.type==='income'||trx.type==='projected_income';
-  var cats = isPem ? ['Salary', 'Freelance', 'Investasi', 'Bisnis', 'Lainnya'] : ['Food', 'Transportasi', 'Subscription', 'Hutang', 'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Lainnya'];
-  if (cats.includes(trx.cat)) {
-    document.getElementById('f-cat').value=trx.cat;
+  var norm = normCat(trx.cat);
+  var cats = isPem 
+    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+  if (cats.includes(norm)) {
+    document.getElementById('f-cat').value=norm;
     document.getElementById('f-custom-cat').value='';
   } else {
     document.getElementById('f-cat').value='custom';
@@ -1047,7 +1064,7 @@ function showAccTrx(accId) {
   if(!trxs.length){el.innerHTML='<tr><td colspan="5"><div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3></div></td></tr>';lucide.createIcons();document.getElementById('acc-trx-card').style.display='';return;}
   el.innerHTML=trxs.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(trx){
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
-      +'<td><span class="badge bpri">'+esc(trx.cat)+'</span></td>'
+      +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
       +'<td style="text-align:right" class="ta '+(trx.type==='income'?'ti':'te')+'">'+(trx.type==='income'?'+':'-')+rpf(trx.amt)+'</td></tr>';
@@ -1108,9 +1125,12 @@ function onTypeChange() {
   var sel = document.getElementById('f-cat');
   var prev = sel.value;
   var isPem = v==='income'||v==='projected_income';
-  var cats = isPem ? ['Salary', 'Freelance', 'Investasi', 'Bisnis', 'Lainnya'] : ['Food', 'Transportasi', 'Subscription', 'Hutang', 'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Lainnya'];
-  sel.innerHTML = cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('') + '<option value="custom">'+t('custom_cat')+'</option>';
-  if (cats.includes(prev) || prev === 'custom') sel.value = prev;
+  var norm = normCat(prev);
+  var cats = isPem 
+    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+  sel.innerHTML = cats.map(function(c){return '<option value="'+c+'">'+tCat(c)+'</option>';}).join('') + '<option value="custom">'+t('custom_cat')+'</option>';
+  if (cats.includes(norm) || prev === 'custom') sel.value = norm;
   else sel.value = cats[0];
   
   var dateInput = document.getElementById('f-date');
@@ -1327,7 +1347,7 @@ function renderDashTable(id, list){
     var recB=trx.rec?'&nbsp;<span class="badge brec" style="font-size:10px"><i data-lucide="repeat"></i>'+getFreqLbl(trx.freq)+'</span>':'';
     return '<tr><td><strong>'+esc(trx.desc)+'</strong>'+recB+'</td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
-      +'<td><span class="badge bpri">'+esc(trx.cat)+'</span></td>'
+      +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td><span class="badge '+ti[1]+'">'+ti[0]+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="text-align:right" class="ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</td></tr>';
@@ -1340,7 +1360,7 @@ function renderSimple(id, list){
   el.innerHTML=list.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(trx){
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
-      +'<td><span class="badge bpri">'+esc(trx.cat)+'</span></td>'
+      +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
       +'<td style="text-align:right" class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</td>'
@@ -1376,7 +1396,7 @@ function renderCalon(id, list){
 
     return '<tr>'
       +'<td><strong>'+esc(trx.desc)+'</strong>'+statBadge+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
-      +'<td><span class="badge bpri">'+esc(trx.cat)+'</span></td>'
+      +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td>'+recL+'</td><td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+limL+'</td>'
@@ -1403,7 +1423,7 @@ function renderPreview(id, items, cls){
     var rb=trx.rec?'&nbsp;<span class="badge brec" style="font-size:10px"><i data-lucide="repeat"></i>'+getFreqLbl(trx.freq)+'</span>':'';
     return '<div style="display:flex;align-items:center;gap:var(--s3);padding:var(--s2) 0;border-bottom:1px solid var(--div)">'
       +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:var(--sm)">'+esc(trx.desc)+rb+'</div>'
-      +'<div style="font-size:var(--xs);color:var(--mut)">'+esc(trx.cat)+(g.cnt>1?' · '+g.cnt+'× '+t('this_month_count'):'')+'</div></div>'
+      +'<div style="font-size:var(--xs);color:var(--mut)">'+esc(tCat(trx.cat))+(g.cnt>1?' · '+g.cnt+'× '+t('this_month_count'):'')+'</div></div>'
       +'<span class="ta '+cls+'" style="font-size:var(--sm);white-space:nowrap">'+rpf(g.total)+'</span></div>';
   }).join('');
 }
@@ -1414,7 +1434,7 @@ function renderReport(fil,mi,me,bal,cm,ck,proj){
     var items=fil.filter(function(trx){return types.indexOf(trx.type)>=0;});
     if(!items.length){el.innerHTML='<div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div>';return;}
     var total=0; items.forEach(function(trx){total+=trx.amt;});
-    var byCat={};items.forEach(function(trx){byCat[trx.cat]=(byCat[trx.cat]||0)+trx.amt;});
+    var byCat={};items.forEach(function(trx){ var cName = tCat(trx.cat); byCat[cName]=(byCat[cName]||0)+trx.amt; });
     var cols=['var(--pri)','var(--blu)','var(--gld)','var(--pur)','var(--ora)','var(--wrn)','var(--err)'];
     el.innerHTML=Object.entries(byCat).sort(function(a,b){return b[1]-a[1];}).map(function(kv,i){
       var pct=total?Math.round(kv[1]/total*100):0;
@@ -1553,7 +1573,8 @@ function setPeriod(p,el){ period=p; document.querySelectorAll('.pt').forEach(fun
 // ===== THEME =====
 window.addEventListener('languageChanged', function() {
   document.getElementById('lang-ind').textContent = currentLang.toUpperCase();
-  render(); // trigger re-render of dynamic tables
+  onTypeChange();
+  render();
 });
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('lang-ind').textContent = currentLang.toUpperCase();
@@ -1594,7 +1615,7 @@ function doExport(){
       Math.round(Number(t.amt || 0) * 100) / 100,
       escCsv(typeMap[t.type] || t.type),
       escCsv(a ? a.name : '-'),
-      escCsv(t.cat || '-'),
+      escCsv(tCat(t.cat) || '-'),
       t.date || '-',
       t.rec ? 'Yes' : 'No',
       escCsv(getFreqLbl(t.freq) || '-'),
