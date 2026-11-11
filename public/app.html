@@ -837,10 +837,118 @@ var CAT_KEYS = {
   'Salary': 'cat_salary', 'Freelance': 'cat_freelance', 'Investment': 'cat_investment', 'Business': 'cat_business',
   'Food': 'cat_food', 'Transportation': 'cat_transportation', 'Subscription': 'cat_subscription',
   'Debt': 'cat_debt', 'Bills': 'cat_bills', 'Entertainment': 'cat_entertainment',
-  'Health': 'cat_health', 'Education': 'cat_education', 'Other': 'cat_other'
+  'Health': 'cat_health', 'Education': 'cat_education'
 };
+var CUSTOM_CAT_DICT = {
+  'Contoh': { en: 'Example', id: 'Contoh' },
+  'Example': { en: 'Example', id: 'Contoh' },
+  'Examples': { en: 'Example', id: 'Contoh' },
+  'Test': { en: 'Test', id: 'Tes' },
+  'Tes': { en: 'Test', id: 'Tes' },
+  'Belanja': { en: 'Shopping', id: 'Belanja' },
+  'Shopping': { en: 'Shopping', id: 'Belanja' },
+  'Bensin': { en: 'Fuel', id: 'Bensin' },
+  'Fuel': { en: 'Fuel', id: 'Bensin' },
+  'Listrik': { en: 'Electricity', id: 'Listrik' },
+  'Electricity': { en: 'Electricity', id: 'Listrik' },
+  'Air': { en: 'Water', id: 'Air' },
+  'Water': { en: 'Water', id: 'Air' },
+  'Pulsa': { en: 'Mobile Credit', id: 'Pulsa' },
+  'Credit': { en: 'Mobile Credit', id: 'Pulsa' },
+  'Internet': { en: 'Internet', id: 'Internet' },
+  'Sedekah': { en: 'Charity', id: 'Sedekah' },
+  'Charity': { en: 'Charity', id: 'Sedekah' },
+  'Donasi': { en: 'Donation', id: 'Donasi' },
+  'Donation': { en: 'Donation', id: 'Donasi' },
+  'Pajak': { en: 'Tax', id: 'Pajak' },
+  'Tax': { en: 'Tax', id: 'Pajak' },
+  'Asuransi': { en: 'Insurance', id: 'Asuransi' },
+  'Insurance': { en: 'Insurance', id: 'Asuransi' },
+  'Cicilan': { en: 'Installment', id: 'Cicilan' },
+  'Installment': { en: 'Installment', id: 'Cicilan' },
+  'Sewa': { en: 'Rent', id: 'Sewa' },
+  'Rent': { en: 'Rent', id: 'Sewa' },
+  'Kopi': { en: 'Coffee', id: 'Kopi' },
+  'Coffee': { en: 'Coffee', id: 'Kopi' },
+  'Jajan': { en: 'Snacks', id: 'Jajan' },
+  'Snacks': { en: 'Snacks', id: 'Jajan' },
+  'Olahraga': { en: 'Sports', id: 'Olahraga' },
+  'Sports': { en: 'Sports', id: 'Olahraga' },
+  'Gym': { en: 'Gym', id: 'Gym' },
+  'Hadiah': { en: 'Gift', id: 'Hadiah' },
+  'Gift': { en: 'Gift', id: 'Hadiah' },
+  'Bonus': { en: 'Bonus', id: 'Bonus' },
+  'Dividen': { en: 'Dividend', id: 'Dividen' },
+  'Dividend': { en: 'Dividend', id: 'Dividen' },
+  'Tabungan': { en: 'Savings', id: 'Tabungan' },
+  'Savings': { en: 'Savings', id: 'Tabungan' },
+  'Keluarga': { en: 'Family', id: 'Keluarga' },
+  'Family': { en: 'Family', id: 'Keluarga' },
+  'Liburan': { en: 'Vacation', id: 'Liburan' },
+  'Vacation': { en: 'Vacation', id: 'Liburan' },
+  'Hewan': { en: 'Pets', id: 'Hewan' },
+  'Pet': { en: 'Pets', id: 'Hewan' },
+  'Pets': { en: 'Pets', id: 'Hewan' }
+};
+async function fetchCatTranslation(word) {
+  if (!word || typeof word !== 'string') return;
+  var w = word.trim();
+  if (!w || w.toLowerCase() === 'custom') return;
+  var lower = w.toLowerCase();
+  for (var k in CUSTOM_CAT_DICT) {
+    if (k.toLowerCase() === lower) return;
+  }
+  var cached = {};
+  try { cached = JSON.parse(localStorage.getItem('ft_custom_trans') || '{}'); } catch(e){}
+  if (cached[lower] && cached[lower].en && cached[lower].id) return;
+  try {
+    var isID = (typeof currentLang !== 'undefined' && currentLang === 'id');
+    var fromLang = isID ? 'id' : 'en';
+    var toLang = isID ? 'en' : 'id';
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(w) + '&langpair=' + fromLang + '|' + toLang;
+    var res = await fetch(url);
+    if (res.ok) {
+      var data = await res.json();
+      if (data && data.responseData && data.responseData.translatedText) {
+        var trans = data.responseData.translatedText.trim();
+        if (trans && !trans.toLowerCase().includes('mymemory')) {
+          cached[lower] = cached[lower] || {};
+          cached[lower][fromLang] = w;
+          cached[lower][toLang] = trans;
+          localStorage.setItem('ft_custom_trans', JSON.stringify(cached));
+          if (typeof render === 'function') render();
+          if (typeof onTypeChange === 'function') onTypeChange();
+        }
+      }
+    }
+  } catch(e) {}
+}
 function normCat(c) { return CAT_ALIASES[c] || c; }
-function tCat(c) { if (!c) return ''; var norm = normCat(c); var k = CAT_KEYS[norm]; return k ? t(k) : c; }
+function tCat(c) {
+  if (!c) return '';
+  var norm = normCat(c);
+  var k = CAT_KEYS[norm];
+  if (k) return t(k);
+  var lower = c.trim().toLowerCase();
+  var lang = (typeof currentLang !== 'undefined' && currentLang === 'id') ? 'id' : 'en';
+  for (var dictKey in CUSTOM_CAT_DICT) {
+    if (dictKey.toLowerCase() === lower) {
+      return CUSTOM_CAT_DICT[dictKey][lang] || c;
+    }
+  }
+  try {
+    var cached = JSON.parse(localStorage.getItem('ft_custom_trans') || '{}');
+    if (cached[lower] && cached[lower][lang]) {
+      return cached[lower][lang];
+    }
+  } catch(e) {}
+  if (!tCat._pending) tCat._pending = {};
+  if (!tCat._pending[lower]) {
+    tCat._pending[lower] = true;
+    fetchCatTranslation(c);
+  }
+  return c;
+}
 function rememberCustomCat(c) {
   if (!c || c === 'custom') return;
   try {
@@ -850,11 +958,12 @@ function rememberCustomCat(c) {
       localStorage.setItem('ft_custom_cats', JSON.stringify(saved));
     }
   } catch(e) {}
+  fetchCatTranslation(c);
 }
 function getCustomCats(isPem) {
   var defCats = isPem 
-    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
-    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+    ? ['Salary', 'Freelance', 'Investment', 'Business'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education'];
   var customSet = [];
   function add(c) {
     if (!c || typeof c !== 'string') return;
@@ -945,8 +1054,8 @@ function editTrx(id) {
   var isPem = trx.type==='income'||trx.type==='projected_income';
   var norm = normCat(trx.cat);
   var defCats = isPem 
-    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
-    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+    ? ['Salary', 'Freelance', 'Investment', 'Business'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education'];
   var allCats = defCats.concat(getCustomCats(isPem));
   if (allCats.includes(norm) || allCats.includes(trx.cat)) {
     document.getElementById('f-cat').value = allCats.includes(norm) ? norm : trx.cat;
@@ -1166,8 +1275,8 @@ function onTypeChange() {
   var isPem = v==='income'||v==='projected_income';
   var norm = normCat(prev);
   var defCats = isPem 
-    ? ['Salary', 'Freelance', 'Investment', 'Business', 'Other'] 
-    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
+    ? ['Salary', 'Freelance', 'Investment', 'Business'] 
+    : ['Food', 'Transportation', 'Subscription', 'Debt', 'Bills', 'Entertainment', 'Health', 'Education'];
   var customCats = getCustomCats(isPem);
   
   var opts = defCats.map(function(c){
@@ -1175,9 +1284,8 @@ function onTypeChange() {
   });
 
   if (customCats.length > 0) {
-    opts.push('<option disabled>──────────</option>');
     customCats.forEach(function(c){
-      opts.push('<option value="'+esc(c)+'">'+esc(c)+'</option>');
+      opts.push('<option value="'+esc(c)+'">'+esc(tCat(c))+'</option>');
     });
   }
 
@@ -1720,7 +1828,7 @@ function doLogout(auto) {
   if (window.lucide) lucide.createIcons();
 }
 function confirmLogout() {
-  ['ft_token','ft_user','ft_db','ft_accs','ft_custom_cats'].forEach(function(k){ localStorage.removeItem(k); });
+  ['ft_token','ft_user','ft_db','ft_accs','ft_custom_cats','ft_custom_trans'].forEach(function(k){ localStorage.removeItem(k); });
   window.location.href = '/home';
 }
 function setUserUI() {
