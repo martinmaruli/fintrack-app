@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 const rules = [
-  body('name').trim().notEmpty().withMessage('Nama wajib diisi.').isLength({ max: 100 }).escape(),
+  body('name').trim().notEmpty().withMessage('Nama wajib diisi.').isLength({ max: 100 }),
   body('type').isIn(['bank','ewallet','cash']).withMessage('Tipe tidak valid.'),
   body('color').optional().matches(/^#[0-9A-Fa-f]{6}$/),
   body('emoji').optional().isLength({ max: 4 }),

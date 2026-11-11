@@ -1,7 +1,7 @@
 const translations = {
   en: {
     // Auth & Navigation
-    app_title: "FinTrack — Financial Tracker",
+    app_title: "FinTrack: Financial Tracker",
     login_title: "Login to FinTrack",
     register_title: "Register to FinTrack",
     login: "Login",
@@ -9,7 +9,7 @@ const translations = {
     sign_up_free: "Sign Up Free",
     email: "Email",
     password: "Password",
-    pass_hint: "⚠️ Must contain an uppercase letter and a number.",
+    pass_hint: "Must contain an uppercase letter and a number.",
     cancel: "Cancel",
     save: "Save",
     processing: "Processing...",
@@ -31,7 +31,7 @@ const translations = {
     hero_badge: "Free & Secure",
     hero_title: "Manage <span>Finances</span><br>Smarter",
     hero_sub: "Track income, expenses, accounts, and financial projections in one place. Synced across all devices.",
-    hero_cta_start: "Get Started — Free",
+    hero_cta_start: "Get Started Free",
     hero_cta_login: "Already have an account",
     feat_title: "Everything you need",
     feat_sub: "Complete features for organized personal financial management",
@@ -47,7 +47,7 @@ const translations = {
     f5_s: "Data stored in the cloud, access from phone, laptop, or tablet anytime.",
     f6_t: "Secure & Encrypted",
     f6_s: "Passwords are hashed with bcrypt. Your data cannot be accessed by others.",
-    footer: "© 2026 FinTrack  ·  Made with ❤️ for better organized finances",
+    footer: "© 2026 FinTrack · Focused financial clarity",
 
     // Dashboard Base
     logout: "Logout",
@@ -84,8 +84,8 @@ const translations = {
     acc_desc: "Manage all your financial accounts",
     inc_desc: "Income that has been received",
     out_desc: "Expenses that have occurred",
-    pi_desc: "Income template — can repeat automatically",
-    po_desc: "Subscriptions, installments, debt — can repeat automatically",
+    pi_desc: "Income template: can repeat automatically",
+    po_desc: "Subscriptions, installments, debt: can repeat automatically",
     rep_desc: "Complete financial reports",
 
     // Views
@@ -162,8 +162,8 @@ const translations = {
     days: "Days",
     see_all: "See All",
     placeholder_desc: "e.g. Monthly Salary",
-    select_account: "— Select account —",
-    no_account_opt: "— No account —",
+    select_account: "Select account",
+    no_account_opt: "No account",
     placeholder_cat: "Type category...",
     auto_recurrence: "Automatic Recurrence",
     frequency: "Frequency",
@@ -200,7 +200,9 @@ const translations = {
     toast_paused: "Paused",
     toast_resumed: "Resumed",
     toast_stopped: "Stopped",
-
+    toast_trx_realized: "Projection realized into actual transaction",
+    toast_save_failed: "Failed to save to database",
+    realize_btn: "Mark Realized",
     // Account view
     acc_view_title: "Accounts & Wallets",
     add_acc_btn: "Add Account",
@@ -216,7 +218,7 @@ const translations = {
   },
   id: {
     // Auth & Navigation
-    app_title: "FinTrack — Pencatat Keuangan",
+    app_title: "FinTrack: Pencatat Keuangan",
     login_title: "Masuk ke FinTrack",
     register_title: "Daftar FinTrack",
     login: "Masuk",
@@ -224,7 +226,7 @@ const translations = {
     sign_up_free: "Daftar Gratis",
     email: "Email",
     password: "Password",
-    pass_hint: "⚠️ Harus mengandung huruf kapital dan angka.",
+    pass_hint: "Harus mengandung huruf kapital dan angka.",
     cancel: "Batal",
     save: "Simpan",
     processing: "Memproses...",
@@ -246,7 +248,7 @@ const translations = {
     hero_badge: "Gratis & Aman",
     hero_title: "Kelola <span>Keuangan</span><br>Kamu Lebih Cerdas",
     hero_sub: "Catat pemasukan, pengeluaran, rekening, dan proyeksi keuangan dalam satu tempat. Sinkron di semua device.",
-    hero_cta_start: "Mulai Sekarang — Gratis",
+    hero_cta_start: "Mulai Sekarang Gratis",
     hero_cta_login: "Sudah punya akun",
     feat_title: "Semua yang kamu butuhkan",
     feat_sub: "Fitur lengkap untuk manajemen keuangan pribadi yang lebih teratur",
@@ -262,7 +264,7 @@ const translations = {
     f5_s: "Data tersimpan di cloud, buka dari HP, laptop, atau tablet kapan saja.",
     f6_t: "Aman & Terenkripsi",
     f6_s: "Password di-hash dengan bcrypt. Data kamu tidak bisa diakses orang lain.",
-    footer: "© 2026 FinTrack  ·  Dibuat dengan ❤️ untuk keuangan yang lebih teratur",
+    footer: "© 2026 FinTrack · Keuangan lebih teratur dan terencana",
 
     // Dashboard Base
     logout: "Keluar",
@@ -299,8 +301,8 @@ const translations = {
     acc_desc: "Kelola semua akun keuangan Anda",
     inc_desc: "Uang masuk yang sudah diterima",
     out_desc: "Pengeluaran yang sudah terjadi",
-    pi_desc: "Template pemasukan — bisa berulang otomatis",
-    po_desc: "Langganan, cicilan, hutang — bisa berulang",
+    pi_desc: "Template pemasukan: bisa berulang otomatis",
+    po_desc: "Langganan, cicilan, hutang: bisa berulang otomatis",
     rep_desc: "Laporan keuangan lengkap",
 
     // Views
@@ -377,8 +379,8 @@ const translations = {
     days: "Hari",
     see_all: "Lihat Semua",
     placeholder_desc: "Contoh: Gaji Bulanan",
-    select_account: "— Pilih akun —",
-    no_account_opt: "— Tanpa akun —",
+    select_account: "Pilih akun",
+    no_account_opt: "Tanpa akun",
     placeholder_cat: "Ketik kategori...",
     auto_recurrence: "Recurrence Otomatis",
     frequency: "Frekuensi",
@@ -415,7 +417,9 @@ const translations = {
     toast_paused: "Di-pause",
     toast_resumed: "Diaktifkan kembali",
     toast_stopped: "Dihentikan",
-
+    toast_trx_realized: "Proyeksi direalisasikan ke transaksi aktual",
+    toast_save_failed: "Gagal menyimpan ke database",
+    realize_btn: "Realisasikan",
     // Account view
     acc_view_title: "Rekening & Dompet",
     add_acc_btn: "Tambah Akun",

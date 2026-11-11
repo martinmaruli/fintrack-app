@@ -20,24 +20,29 @@ function decryptRow(row) {
 }
 
 const rules = [
-  body('desc').trim().notEmpty().withMessage('Deskripsi wajib diisi.').isLength({ max: 200 }).escape(),
+  body('desc').trim().notEmpty().withMessage('Deskripsi wajib diisi.').isLength({ max: 200 }),
   body('amt').isFloat({ min: 0.01 }).withMessage('Jumlah harus lebih dari 0.'),
   body('type').isIn(TYPES).withMessage('Tipe tidak valid.'),
-  body('cat').trim().notEmpty().withMessage('Kategori wajib diisi.').isLength({ max: 100 }).escape(),
+  body('cat').trim().notEmpty().withMessage('Kategori wajib diisi.').isLength({ max: 100 }),
   body('date').isDate().withMessage('Format tanggal tidak valid.'),
-  body('note').optional().trim().isLength({ max: 500 }).escape(),
+  body('note').optional({ nullable: true }).trim().isLength({ max: 500 }),
   body('acc_id').optional({ nullable: true }).isInt({ min: 1 }),
   body('rec').optional().isBoolean(),
   body('freq').optional({ nullable: true }).custom(value => {
-    if (value === null || value === 'monthly') return true;
+    if (!value || value === 'monthly' || value === 'weekly') return true;
     if (/^custom_\d+$/.test(value)) {
-      const days = parseInt(value.split('_')[1]);
+      const days = parseInt(value.split('_')[1], 10);
       if (days > 0) return true;
     }
     throw new Error('Frekuensi tidak valid.');
   }),
-  body('cnt').optional({ nullable: true }).isLength({ max: 10 }),
-  body('end_date').optional({ nullable: true }).isDate(),
+  body('cnt').optional({ nullable: true, checkFalsy: true }).custom(v => {
+    if (v === null || v === undefined || v === '') return true;
+    const n = Number(v);
+    if (Number.isInteger(n) && n >= 1 && n <= 360) return true;
+    throw new Error('Jumlah pengulangan tidak valid.');
+  }),
+  body('end_date').optional({ nullable: true, checkFalsy: true }).isDate().withMessage('Format tanggal selesai tidak valid.'),
 ];
 
 router.get('/', async (req, res) => {
@@ -152,84 +157,91 @@ router.post('/auto-process', async (req, res) => {
     const r = await query(
       `SELECT * FROM transactions
        WHERE user_id = $1 AND type IN ($2, $3)
-       AND date <= $4`,
+       AND date <= $4 AND rec = true`,
       [req.user.id, encryptDeterministic('calon_pemasukan'), encryptDeterministic('calon_pengeluaran'), today]
     );
 
     let processedCount = 0;
-    
-    const formatDate = (d) => {
+
+    const parseYMD = (d) => {
+      if (!d) return null;
+      if (typeof d === 'string') {
+        const [y, m, day] = d.split('T')[0].split('-').map(Number);
+        return new Date(y, m - 1, day);
+      }
       const dt = new Date(d);
-      return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+      return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    };
+
+    const formatYMD = (dt) => {
+      return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
     };
 
     for (let t of r.rows) {
       const actualType = decryptDeterministic(t.type) === 'calon_pemasukan' ? 'pemasukan' : 'pengeluaran';
-      let currentFormatDate = formatDate(t.date);
-      
+      let currDt = parseYMD(t.date);
+      let currentFormatDate = formatYMD(currDt);
+
+      let decryptedNote = decrypt(t.note) || '';
+      let isPaused = decryptedNote.includes('[PAUSED]');
+      let isStopped = decryptedNote.includes('[STOPPED]');
+
+      if (isPaused || isStopped) {
+        continue;
+      }
+
       let iters = 0;
-      let deleteIt = false;
-      let nextCntStr = t.cnt;
+      let stopped = false;
+      let nextCntStr = t.cnt ? String(t.cnt) : null;
+      let latestNote = decryptedNote;
 
       while (currentFormatDate <= today && iters < 100) {
         iters++;
-        let decryptedNote = decrypt(t.note);
-        let isPaused = decryptedNote && decryptedNote.includes('[PAUSED]');
-        let isStopped = decryptedNote && decryptedNote.includes('[STOPPED]');
-
-        if (!isPaused && !isStopped) {
-          // Insert actual
-          let newNote = decryptedNote ? decryptedNote + ' (Auto)' : '(Auto)';
-          await query(
-            `INSERT INTO transactions (description, amt, type, cat, date, note, acc_id, user_id)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-            [encrypt(decrypt(t.description)), t.amt, encryptDeterministic(actualType), encrypt(decrypt(t.cat)), currentFormatDate, encrypt(newNote), t.acc_id, req.user.id]
-          );
-          processedCount++;
-        }
-
-        if (!t.rec) {
-          deleteIt = true;
-          break; // One time
-        } else {
-          // calculate next date
-          const dt = new Date(currentFormatDate);
-          if (t.freq === 'monthly') dt.setMonth(dt.getMonth() + 1);
-          else if (t.freq && t.freq.startsWith('custom_')) dt.setDate(dt.getDate() + parseInt(t.freq.split('_')[1]));
-          else { deleteIt = true; break; } // safety fallback
-
-          currentFormatDate = formatDate(dt);
-
-          if (t.end_date) {
-            const ed = formatDate(t.end_date);
-            if (currentFormatDate > ed) {
-              deleteIt = true;
-              break;
-            }
-          }
-
-          if (nextCntStr) {
-            const c = parseInt(nextCntStr, 10);
-            if (!isNaN(c)) {
-              if (c <= 1) {
-                deleteIt = true;
-                break;
-              } else {
-                nextCntStr = (c - 1).toString();
-              }
-            }
-          }
-        }
-      }
-
-      if (deleteIt) {
-        await query(`DELETE FROM transactions WHERE id = $1`, [t.id]);
-      } else {
+        const newNote = decryptedNote ? decryptedNote + ' (Auto)' : '(Auto)';
         await query(
-          `UPDATE transactions SET date = $1, cnt = $2 WHERE id = $3`,
-          [currentFormatDate, nextCntStr, t.id]
+          `INSERT INTO transactions (description, amt, type, cat, date, note, acc_id, user_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [encrypt(decrypt(t.description)), t.amt, encryptDeterministic(actualType), encrypt(decrypt(t.cat)), currentFormatDate, encrypt(newNote), t.acc_id, req.user.id]
         );
+        processedCount++;
+
+        if (t.freq === 'monthly') currDt.setMonth(currDt.getMonth() + 1);
+        else if (t.freq === 'weekly') currDt.setDate(currDt.getDate() + 7);
+        else if (t.freq && t.freq.startsWith('custom_')) currDt.setDate(currDt.getDate() + parseInt(t.freq.split('_')[1], 10));
+        else { stopped = true; break; }
+
+        currentFormatDate = formatYMD(currDt);
+
+        if (t.end_date) {
+          const edStr = formatYMD(parseYMD(t.end_date));
+          if (currentFormatDate > edStr) {
+            stopped = true;
+            break;
+          }
+        }
+
+        if (nextCntStr) {
+          const c = parseInt(nextCntStr, 10);
+          if (!isNaN(c)) {
+            if (c <= 1) {
+              stopped = true;
+              nextCntStr = '0';
+              break;
+            } else {
+              nextCntStr = (c - 1).toString();
+            }
+          }
+        }
       }
+
+      if (stopped && !latestNote.includes('[STOPPED]')) {
+        latestNote = '[STOPPED] ' + latestNote;
+      }
+
+      await query(
+        `UPDATE transactions SET date = $1, cnt = $2, note = $3 WHERE id = $4`,
+        [currentFormatDate, nextCntStr, encrypt(latestNote.trim()), t.id]
+      );
     }
 
     res.json({ success: true, processed: processedCount });
@@ -248,10 +260,12 @@ router.post('/', rules, async (req, res) => {
     if (!chk.rows.length) return res.status(403).json({ error: 'Akun tidak ditemukan.' });
   }
   try {
+    const safeCnt = (cnt !== undefined && cnt !== null && cnt !== '') ? String(cnt) : null;
+    const safeEndDate = end_date || null;
     const r = await query(
       `INSERT INTO transactions (description,amt,type,cat,date,note,acc_id,rec,freq,cnt,end_date,user_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
-      [encrypt(desc), parseFloat(amt), encryptDeterministic(type), encrypt(cat), date, note ? encrypt(note) : null, acc_id||null, !!rec, freq||null, cnt||null, end_date||null, req.user.id]
+      [encrypt(desc), parseFloat(amt), encryptDeterministic(type), encrypt(cat), date, note ? encrypt(note) : null, acc_id||null, !!rec, freq||null, safeCnt, safeEndDate, req.user.id]
     );
     res.status(201).json(decryptRow(r.rows[0]));
   } catch (e) { res.status(500).json({ error: 'Gagal menyimpan transaksi.' }); }
@@ -266,12 +280,14 @@ router.put('/:id', [param('id').isInt(), ...rules], async (req, res) => {
     if (!chk.rows.length) return res.status(403).json({ error: 'Akun tidak ditemukan.' });
   }
   try {
+    const safeCnt = (cnt !== undefined && cnt !== null && cnt !== '') ? String(cnt) : null;
+    const safeEndDate = end_date || null;
     const r = await query(
       `UPDATE transactions SET description=$1,amt=$2,type=$3,cat=$4,date=$5,
        note=$6,acc_id=$7,rec=$8,freq=$9,cnt=$10,end_date=$11
        WHERE id=$12 AND user_id=$13 RETURNING *`,
       [encrypt(desc), parseFloat(amt), encryptDeterministic(type), encrypt(cat), date, note ? encrypt(note) : null, acc_id||null, !!rec,
-       freq||null, cnt||null, end_date||null, parseInt(req.params.id), req.user.id]
+       freq||null, safeCnt, safeEndDate, parseInt(req.params.id), req.user.id]
     );
     if (!r.rows.length) return res.status(404).json({ error: 'Transaksi tidak ditemukan.' });
     res.json(decryptRow(r.rows[0]));

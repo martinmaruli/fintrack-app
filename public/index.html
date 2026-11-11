@@ -3,103 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="app_title">FinTrack — Financial Tracker</title>
+<title data-i18n="app_title">FinTrack: Financial Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
-:root,[data-theme="light"]{
-  --bg:#f8fafc;--sur:#ffffff;--off:#f1f5f9;--bor:#e2e8f0;--div:#edf2f7;
-  --txt:#0f172a;--mut:#64748b;--inv:#ffffff;
-  --pri:#0284c7;--prih:#0369a1;--prhl:rgba(2,132,199,.1);
-  --suc:#059669;--suchl:rgba(5,150,105,.1);--err:#e11d48;--errhl:rgba(225,29,72,.1);
-  --gld:#d97706;--gldhl:rgba(217,119,6,.1);--blu:#2563eb;--bluhl:rgba(37,99,235,.1);
-  --ora:#ea580c;--orahl:rgba(234,88,12,.1);--pur:#9333ea;--purhl:rgba(147,51,234,.1);
-  --sh2:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -2px rgba(0,0,0,.05);--sh3:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.06);
-  --rsm:.375rem;--rmd:.5rem;--rlg:.75rem;--rxl:1rem;--rfl:9999px;
-  --tr:160ms cubic-bezier(.16,1,.3,1);
-  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+::root,[data-theme="light"]{
+  --bg:#f2f2f7;--sur:#ffffff;--sur2:#f8f8fa;--off:#efeff4;--bor:rgba(0,0,0,.08);--div:rgba(0,0,0,.06);
+  --spec:rgba(255,255,255,.8);
+  --txt:#1c1c1e;--mut:#5c5c63;--fnt:#6c6c70;--inv:#ffffff;
+  --pri:#0062cc;--prih:#0051a8;--prhl:rgba(0,98,204,.1);
+  --suc:#1d7f36;--suchl:rgba(29,127,54,.12);--err:#d70015;--errhl:rgba(215,0,21,.12);
+  --gld:#a16207;--gldhl:rgba(161,98,7,.12);--blu:#0062cc;--bluhl:rgba(0,98,204,.12);
+  --ora:#b45309;--orahl:rgba(180,83,9,.12);--pur:#6b21a8;--purhl:rgba(107,33,168,.12);
+  --sh1:0 2px 8px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.02);
+  --sh2:0 8px 24px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --sh3:0 24px 48px rgba(0,0,0,.14),0 8px 16px rgba(0,0,0,.06);
+  --rsm:.375rem;--rmd:.5rem;--rlg:.75rem;--rxl:1.125rem;--r2xl:1.5rem;--rfl:9999px;
+  --tr:180ms cubic-bezier(.16,1,.3,1);
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Inter',sans-serif;
   --xs:.8125rem;--sm:.9375rem;--base:1rem;--lg:1.25rem;
   --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;
   --s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;
 }
 [data-theme="dark"]{
-  --bg:#090a0f;--sur:#11131a;--off:#1c1f2b;--bor:#282c3c;--div:#1a1d28;
-  --txt:#f1f5f9;--mut:#94a3b8;--inv:#090a0f;
-  --pri:#38bdf8;--prih:#0ea5e9;--prhl:rgba(56,189,248,.12);
-  --suc:#34d399;--suchl:rgba(52,211,153,.12);--err:#fb7185;--errhl:rgba(251,113,133,.12);
-  --gld:#fbbf24;--gldhl:rgba(251,191,36,.12);--blu:#60a5fa;--bluhl:rgba(96,165,250,.12);
-  --ora:#fb923c;--orahl:rgba(251,146,60,.12);--pur:#c084fc;--purhl:rgba(192,132,252,.12);
-  --sh2:0 4px 8px -1px rgba(0,0,0,.4),0 2px 4px -2px rgba(0,0,0,.3);--sh3:0 24px 32px -6px rgba(0,0,0,.6);
+  --bg:#0b0c10;--sur:#14161f;--sur2:#1c1f2b;--off:#222634;--bor:rgba(255,255,255,.09);--div:rgba(255,255,255,.07);
+  --spec:rgba(255,255,255,.14);
+  --txt:#f5f5f7;--mut:#98989d;--fnt:#8e8e93;--inv:#0b0c10;
+  --pri:#38bdf8;--prih:#0ea5e9;--prhl:rgba(56,189,248,.14);
+  --suc:#30d158;--suchl:rgba(48,209,88,.14);--err:#ff453a;--errhl:rgba(255,69,58,.14);
+  --gld:#ffd60a;--gldhl:rgba(255,214,10,.14);--blu:#38bdf8;--bluhl:rgba(56,189,248,.14);
+  --ora:#ff9f0a;--orahl:rgba(255,159,10,.14);--pur:#bf5af2;--purhl:rgba(191,90,242,.14);
+  --sh1:0 2px 8px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.2);
+  --sh2:0 12px 28px rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.25);
+  --sh3:0 30px 60px rgba(0,0,0,.65),0 12px 24px rgba(0,0,0,.35);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased}
 body{font-family:var(--font);font-size:var(--sm);color:var(--txt);background:var(--bg);min-height:100vh}
 button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:var(--rsm)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);padding:var(--s2) var(--s4);border-radius:var(--rmd);font-size:var(--sm);font-weight:500;transition:background var(--tr),color var(--tr),transform var(--tr);white-space:nowrap;min-height:38px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);padding:var(--s2) var(--s4);border-radius:var(--rlg);font-size:var(--sm);font-weight:500;transition:background var(--tr),color var(--tr),transform var(--tr);white-space:nowrap;min-height:40px}
 .btn:active{transform:scale(.98)}
 .btn i{width:16px;height:16px}
-.bp{background:var(--pri);color:var(--inv);font-weight:600}.bp:hover{background:var(--prih)}
-.bg{color:var(--txt);border:1px solid var(--bor);background:var(--sur)}.bg:hover{background:var(--off);border-color:var(--div)}
-.mb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:var(--s4);backdrop-filter:blur(6px);transition:opacity var(--tr)}
+.bp{background:var(--pri);color:var(--inv);font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.15)}.bp:hover{background:var(--prih)}
+.bg{color:var(--txt);border:1px solid var(--bor);background:var(--sur);box-shadow:inset 0 1px 0 var(--spec)}.bg:hover{background:var(--off);border-color:var(--div)}
+.mb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:var(--s4);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);transition:opacity var(--tr)}
 .mb.hide{display:none}
-.mo{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rxl);padding:var(--s6);width:100%;max-width:440px;box-shadow:var(--sh3);animation:su .22s cubic-bezier(.16,1,.3,1)}
+.mo{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r2xl);padding:var(--s6);width:100%;max-width:440px;box-shadow:var(--sh3),inset 0 1px 0 var(--spec);animation:su .22s cubic-bezier(.16,1,.3,1)}
 @keyframes su{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 .mttl{font-size:var(--base);font-weight:700;margin-bottom:var(--s5);display:flex;align-items:center;gap:var(--s2)}
 .mttl i{width:18px;height:18px;color:var(--pri)}
 .fg{display:flex;flex-direction:column;gap:var(--s4)}
 .fgrp{display:flex;flex-direction:column;gap:var(--s1)}
 .fl{font-size:var(--xs);font-weight:600;color:var(--mut)}
-.fi{background:var(--off);border:1px solid var(--bor);border-radius:var(--rmd);padding:var(--s2) var(--s3);font-size:var(--sm);color:var(--txt);width:100%;transition:border-color var(--tr),box-shadow var(--tr);min-height:40px}
+.fi{background:var(--off);border:1px solid var(--bor);border-radius:var(--rlg);padding:var(--s2) var(--s3);font-size:var(--sm);color:var(--txt);width:100%;transition:border-color var(--tr),box-shadow var(--tr);min-height:42px}
 .fi:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--prhl)}
 .fa{display:flex;gap:var(--s3);justify-content:flex-end;margin-top:var(--s2)}
-.tabs{display:flex;background:var(--off);border-radius:var(--rmd);padding:3px;gap:2px;margin-bottom:var(--s5);border:1px solid var(--bor)}
-.tab{flex:1;padding:var(--s2);border-radius:calc(var(--rmd) - 3px);font-size:var(--sm);font-weight:500;color:var(--mut);cursor:pointer;text-align:center;transition:background var(--tr),color var(--tr)}
+.tabs{display:flex;background:var(--off);border-radius:var(--rlg);padding:3px;gap:2px;margin-bottom:var(--s5);border:1px solid var(--bor)}
+.tab{flex:1;padding:var(--s2);border-radius:calc(var(--rlg) - 3px);font-size:var(--sm);font-weight:500;color:var(--mut);cursor:pointer;text-align:center;transition:background var(--tr),color var(--tr);background:none;border:none}
 .tab.on{background:var(--sur);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.15);font-weight:600}
 .msg{font-size:var(--xs);padding:var(--s2) var(--s3);border-radius:var(--rmd);display:none;margin-bottom:var(--s3)}
 .msg.show{display:block}
 .err{background:var(--errhl);color:var(--err);border:1px solid rgba(244,63,94,.2)}
 .ok{background:var(--suchl);color:var(--suc);border:1px solid rgba(16,185,129,.2)}
-nav{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s8);border-bottom:1px solid var(--bor);background:var(--sur);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+nav{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s8);border-bottom:1px solid var(--bor);background:var(--sur);position:sticky;top:0;z-index:10;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 1px 0 var(--spec)}
 .logo{display:flex;align-items:center;gap:var(--s3);font-size:var(--base);font-weight:700;text-decoration:none;color:var(--txt)}
-.logo-ic{width:32px;height:32px;background:var(--pri);border-radius:var(--rmd);display:flex;align-items:center;justify-content:center}
+.logo-ic{width:32px;height:32px;background:var(--pri);border-radius:var(--rmd);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .logo span{color:var(--pri)}
 .nav-r{display:flex;gap:var(--s3);align-items:center}
-.theme-btn{padding:var(--s2);border-radius:var(--rmd);color:var(--mut);transition:background var(--tr),color var(--tr);min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center}
+.theme-btn{padding:var(--s2);border-radius:var(--rlg);color:var(--mut);transition:background var(--tr),color var(--tr);min-width:38px;min-height:38px;display:inline-flex;align-items:center;justify-content:center}
 .theme-btn:hover{background:var(--off);color:var(--txt)}
-.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:5rem var(--s8) 4rem;gap:var(--s5);max-width:900px;margin:0 auto}
-.badge{display:inline-flex;align-items:center;gap:var(--s2);padding:var(--s1) var(--s4);border-radius:var(--rfl);background:var(--prhl);color:var(--pri);font-size:var(--xs);font-weight:600;border:1px solid rgba(56,189,248,.25)}
-h1{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1.08}
+.hero-section{max-width:1160px;margin:0 auto;padding:4.5rem var(--s8) 3.5rem}
+.hero-grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:var(--s8);align-items:center}
+.hero-text{display:flex;flex-direction:column;gap:var(--s4)}
+.badge{display:inline-flex;align-items:center;gap:var(--s2);padding:4px var(--s3);border-radius:var(--rsm);background:var(--prhl);color:var(--pri);font-size:var(--xs);font-weight:600;border:1px solid rgba(56,189,248,.25);width:fit-content}
+h1{font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:800;letter-spacing:-.035em;line-height:1.08}
 h1 span{color:var(--pri)}
-.sub{font-size:var(--base);color:var(--mut);max-width:48ch;line-height:1.65}
-.ctas{display:flex;gap:var(--s3);flex-wrap:wrap;justify-content:center}
-.btnlg{padding:var(--s3) var(--s6);font-size:var(--base);min-height:46px}
+.sub{font-size:var(--base);color:var(--mut);max-width:46ch;line-height:1.6}
+.ctas{display:flex;gap:var(--s3);flex-wrap:wrap}
+.btnlg{padding:var(--s3) var(--s6);font-size:var(--base);min-height:48px}
 .btnlg i{width:18px;height:18px}
-.feats{padding:2rem var(--s8) 5rem;max-width:1100px;margin:0 auto}
+.preview-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r2xl);padding:var(--s6);box-shadow:var(--sh2),inset 0 1px 0 var(--spec);display:flex;flex-direction:column;gap:var(--s4)}
+.p-head{display:flex;justify-content:space-between;align-items:center}
+.p-title{font-size:var(--xs);font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.p-kpi{font-size:clamp(1.5rem,2.4vw,2.2rem);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums lining-nums;color:var(--txt)}
+.p-sub{font-size:var(--xs);color:var(--suc);font-weight:600;display:flex;align-items:center;gap:4px}
+.p-rows{display:flex;flex-direction:column;gap:var(--s2)}
+.p-row{display:flex;justify-content:space-between;align-items:center;padding:var(--s2) 0;border-bottom:1px solid var(--div);font-size:var(--xs)}
+.p-row:last-child{border-bottom:none}
+.feats{padding:2rem var(--s8) 5rem;max-width:1160px;margin:0 auto}
 .ft{text-align:center;font-size:var(--lg);font-weight:700;margin-bottom:var(--s2);letter-spacing:-.02em}
 .fs{text-align:center;color:var(--mut);font-size:var(--sm);margin-bottom:var(--s8)}
-.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s4)}
-.fc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rlg);padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3);transition:box-shadow var(--tr),border-color var(--tr)}
+.showcase-grid{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr;gap:var(--s4)}
+.fc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rxl);padding:var(--s6);display:flex;flex-direction:column;gap:var(--s3);box-shadow:var(--sh1),inset 0 1px 0 var(--spec);transition:box-shadow var(--tr),border-color var(--tr)}
 .fc:hover{box-shadow:var(--sh2);border-color:var(--div)}
-.fic{width:44px;height:44px;border-radius:var(--rmd);display:flex;align-items:center;justify-content:center}
-.fic i{width:22px;height:22px}
+.fc.hero-card{background:linear-gradient(145deg,var(--sur),var(--sur2))}
+.fic{width:42px;height:42px;border-radius:var(--rmd);display:flex;align-items:center;justify-content:center}
+.fic i{width:20px;height:20px}
 .fn{font-size:var(--sm);font-weight:700}
-.fd{font-size:var(--xs);color:var(--mut);line-height:1.65}
-footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);border-top:1px solid var(--div)}
+.fd{font-size:var(--xs);color:var(--mut);line-height:1.6}
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:var(--s6)}
+  .showcase-grid{grid-template-columns:1fr}
+}
 @media(max-width:600px){
   nav{padding:var(--s3) var(--s4);gap:var(--s2)}
   .logo{font-size:var(--sm);gap:var(--s2)}
   .logo-ic{width:28px;height:28px}
   .nav-r{gap:var(--s2)}
   .nav-r .btn{padding:var(--s1) var(--s3);font-size:var(--xs)}
-  .hero{padding:3rem var(--s4) 2.5rem}
+  .hero-section{padding:2.5rem var(--s4) 2rem}
   h1{font-size:clamp(1.75rem,7vw,2.2rem)}
   .sub{font-size:var(--sm)}
   .btnlg{padding:var(--s2) var(--s4);font-size:var(--sm)}
   .feats{padding:1.5rem var(--s4) 3rem}
-  .fg2{grid-template-columns:1fr}
   .mb{align-items:flex-end;padding:0}
-  .mo{max-width:100%;border-radius:var(--rxl) var(--rxl) 0 0;max-height:85dvh;padding:var(--s5) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+  .mo{max-width:100%;border-radius:var(--r2xl) var(--r2xl) 0 0;max-height:85dvh;padding:var(--s5) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
 }
 </style>
 </head>
@@ -109,8 +131,8 @@ footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);
   <div class="mo">
     <div class="mttl"><i data-lucide="log-in"></i><span id="auth-ttl" data-i18n="login_title">Login to FinTrack</span></div>
     <div class="tabs">
-      <div class="tab on" id="tab-in" onclick="switchTab('login')" data-i18n="login">Login</div>
-      <div class="tab" id="tab-reg" onclick="switchTab('register')" data-i18n="register">Register</div>
+      <button type="button" class="tab on" id="tab-in" onclick="switchTab('login')" data-i18n="login">Login</button>
+      <button type="button" class="tab" id="tab-reg" onclick="switchTab('register')" data-i18n="register">Register</button>
     </div>
     <div class="msg err" id="auth-err"></div>
     <div class="msg ok"  id="auth-ok"></div>
@@ -130,7 +152,7 @@ footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);
           <div style="text-align:right; margin-top:var(--s1)" id="btn-forgot-pass-div"><button type="button" style="font-size:var(--xs); color:var(--pri); font-weight:500;" onclick="startForgotPass()" data-i18n="forgot_password">Forgot Password?</button></div>
         </div>
         <div class="fgrp" id="pass-hint" style="display:none;margin-top:var(--s1)">
-          <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">⚠️ Must contain an uppercase letter and a number.</p>
+          <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">Must contain an uppercase letter and a number.</p>
         </div>
       </div>
       
@@ -165,7 +187,7 @@ footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);
             <button type="button" tabindex="-1" onclick="togglePassword('a-new-pass', 'eye-new-pass')" style="position:absolute; right:10px; color:var(--mut); display:flex; align-items:center; justify-content:center;"><i id="eye-new-pass" data-lucide="eye" style="width:18px;height:18px;"></i></button>
           </div>
           <div class="fgrp" style="margin-top:var(--s1)">
-            <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">⚠️ Must contain an uppercase letter and a number.</p>
+            <p style="font-size:var(--xs);color:var(--mut)" data-i18n="pass_hint">Must contain an uppercase letter and a number.</p>
           </div>
         </div>
       </div>
@@ -193,34 +215,68 @@ footer{text-align:center;padding:var(--s8);color:var(--mut);font-size:var(--xs);
   </div>
 </nav>
 
-<section class="hero">
-  <div class="badge"><i data-lucide="shield-check" style="width:12px;height:12px"></i><span data-i18n="hero_badge">Free &amp; Secure</span></div>
-  <h1 data-i18n="hero_title">Manage <span>Finances</span><br>Smarter</h1>
-  <p class="sub" data-i18n="hero_sub">Track income, expenses, accounts, and financial projections in one place. Synced across all devices.</p>
-  <div class="ctas">
-    <button class="btn bp btnlg" onclick="openAuth('register')"><i data-lucide="rocket"></i><span data-i18n="hero_cta_start">Get Started — Free</span></button>
-    <button class="btn bg btnlg" onclick="openAuth('login')"><i data-lucide="log-in"></i><span data-i18n="hero_cta_login">Already have an account</span></button>
+<section class="hero-section">
+  <div class="hero-grid">
+    <div class="hero-text">
+      <div class="badge"><i data-lucide="shield-check" style="width:12px;height:12px"></i><span data-i18n="hero_badge">Free &amp; Secure</span></div>
+      <h1 data-i18n="hero_title">Manage <span>Finances</span><br>Smarter</h1>
+      <p class="sub" data-i18n="hero_sub">Track income, expenses, accounts, and financial projections in one place. Synced across all devices.</p>
+      <div class="ctas">
+        <button type="button" class="btn bp btnlg" onclick="openAuth('register')"><i data-lucide="rocket"></i><span data-i18n="hero_cta_start">Get Started Free</span></button>
+        <button type="button" class="btn bg btnlg" onclick="openAuth('login')"><i data-lucide="log-in"></i><span data-i18n="hero_cta_login">Already have an account</span></button>
+      </div>
+    </div>
+    <div class="preview-card" aria-label="Interactive Financial Preview">
+      <div class="p-head">
+        <span class="p-title" data-i18n="final_projection">Final Projection</span>
+        <span class="p-sub"><i data-lucide="trending-up" style="width:14px;height:14px"></i>+12.4%</span>
+      </div>
+      <div class="p-kpi">Rp 24.850.000</div>
+      <div class="p-rows">
+        <div class="p-row">
+          <span style="color:var(--mut)" data-i18n="lbl_total_balance">Total Balance</span>
+          <span style="font-weight:600;font-variant-numeric:tabular-nums">Rp 18.200.000</span>
+        </div>
+        <div class="p-row">
+          <span style="color:var(--mut)" data-i18n="lbl_proj_income">Projected Income</span>
+          <span style="color:var(--suc);font-weight:600;font-variant-numeric:tabular-nums">+Rp 8.000.000</span>
+        </div>
+        <div class="p-row">
+          <span style="color:var(--mut)" data-i18n="lbl_proj_expense">Projected Expense</span>
+          <span style="color:var(--err);font-weight:600;font-variant-numeric:tabular-nums">-Rp 1.350.000</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="feats">
   <h2 class="ft" data-i18n="feat_title">Everything you need</h2>
   <p class="fs" data-i18n="feat_sub">Complete features for organized personal financial management</p>
-  <div class="fg2">
-    <div class="fc"><div class="fic" style="background:var(--prhl);color:var(--pri)"><i data-lucide="wallet"></i></div><div class="fn" data-i18n="f1_t">Multi Accounts &amp; Wallets</div><div class="fd" data-i18n="f1_s">Manage bank, e-wallets, and cash in one neat dashboard.</div></div>
-    <div class="fc"><div class="fic" style="background:var(--suchl);color:var(--suc)"><i data-lucide="trending-up"></i></div><div class="fn" data-i18n="f2_t">Financial Projections</div><div class="fd" data-i18n="f2_s">Estimate end-of-month balance based on routine income and expenses.</div></div>
-    <div class="fc"><div class="fic" style="background:var(--gldhl);color:var(--gld)"><i data-lucide="repeat"></i></div><div class="fn" data-i18n="f3_t">Recurring Transactions</div><div class="fd" data-i18n="f3_s">Set up installments or subscriptions once, calculated automatically every period.</div></div>
-    <div class="fc"><div class="fic" style="background:var(--bluhl);color:var(--blu)"><i data-lucide="bar-chart-2"></i></div><div class="fn" data-i18n="f4_t">Visual Reports</div><div class="fd" data-i18n="f4_s">Analyze expenses by category and account briefly.</div></div>
-    <div class="fc"><div class="fic" style="background:var(--purhl);color:var(--pur)"><i data-lucide="smartphone"></i></div><div class="fn" data-i18n="f5_t">Multi Device Access</div><div class="fd" data-i18n="f5_s">Data stored in the cloud, access from phone, laptop, or tablet anytime.</div></div>
-    <div class="fc"><div class="fic" style="background:var(--orahl);color:var(--ora)"><i data-lucide="shield"></i></div><div class="fn" data-i18n="f6_t">Secure &amp; Encrypted</div><div class="fd" data-i18n="f6_s">Passwords are hashed with bcrypt. Your data cannot be accessed by others.</div></div>
+  <div class="showcase-grid">
+    <div class="fc hero-card">
+      <div class="fic" style="background:var(--suchl);color:var(--suc)"><i data-lucide="trending-up"></i></div>
+      <div class="fn" data-i18n="f2_t">Financial Projections</div>
+      <div class="fd" data-i18n="f2_s">Estimate end-of-month balance based on routine income and expenses.</div>
+    </div>
+    <div class="fc">
+      <div class="fic" style="background:var(--prhl);color:var(--pri)"><i data-lucide="wallet"></i></div>
+      <div class="fn" data-i18n="f1_t">Multi Accounts &amp; Wallets</div>
+      <div class="fd" data-i18n="f1_s">Manage bank, e-wallets, and cash in one neat dashboard.</div>
+    </div>
+    <div class="fc">
+      <div class="fic" style="background:var(--gldhl);color:var(--gld)"><i data-lucide="repeat"></i></div>
+      <div class="fn" data-i18n="f3_t">Recurring Transactions</div>
+      <div class="fd" data-i18n="f3_s">Set up installments or subscriptions once, calculated automatically every period.</div>
+    </div>
   </div>
 </section>
 
-<footer data-i18n="footer">© 2026 FinTrack &nbsp;·&nbsp; Made with ❤️ for better organized finances</footer>
+<footer data-i18n="footer">© 2026 FinTrack · Focused financial clarity</footer>
 
 <script src="i18n.js"></script>
 <script>
-var API = ''; // Same domain — frontend & backend served from same Vercel deployment
+var API = ''; // Same domain: frontend & backend served from same Vercel deployment
 
 function togglePassword(inputId, iconId) {
   var input = document.getElementById(inputId);
@@ -471,6 +527,13 @@ async function submitAuth(e) {
 }
 (function(){
   if (localStorage.getItem('ft_token')) window.location.href = 'app.html';
+  var m = document.getElementById('m-auth');
+  if (m) {
+    m.addEventListener('click', function(e){ if (e.target === m) m.classList.add('hide'); });
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && m) m.classList.add('hide');
+  });
   lucide.createIcons();
 })();
 </script>
