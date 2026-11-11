@@ -274,7 +274,7 @@ h1 span{color:var(--pri)}
 
 <footer data-i18n="footer">© 2026 FinTrack · Focused financial clarity</footer>
 
-<script src="i18n.js"></script>
+<script src="/i18n.js"></script>
 <script>
 var API = ''; // Same domain: frontend & backend served from same Vercel deployment
 
@@ -511,7 +511,8 @@ async function submitAuth(e) {
     } else if (mode === 'set-pin' || mode === 'verify-pin') {
       localStorage.setItem('ft_token', data.token);
       localStorage.setItem('ft_user', JSON.stringify(data.user));
-      window.location.href = 'app.html';
+      var target = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+      window.location.href = target;
     }
   } catch(err) {
     errEl.textContent = err.message;
@@ -526,8 +527,14 @@ async function submitAuth(e) {
   lucide.createIcons();
 }
 (function(){
-  if (localStorage.getItem('ft_token')) window.location.href = 'app.html';
-  var m = document.getElementById('m-auth');
+  if (localStorage.getItem('ft_token')) {
+    var target = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+    window.location.href = target;
+    return;
+  }
+  if (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html')) {
+    window.history.replaceState(null, '', '/home' + window.location.search);
+  }
   if (m) {
     m.addEventListener('click', function(e){ if (e.target === m) m.classList.add('hide'); });
   }

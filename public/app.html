@@ -466,118 +466,14 @@ tbody tr:last-child td{border-bottom:none}
 
     <main class="mc">
 
-      <!-- DASHBOARD -->
-      <div class="view on" id="view-dashboard">
-        <div class="kg">
-          <div class="kc ki"><div class="kl"><i data-lucide="arrow-down-circle"></i><span data-i18n="income">Income</span></div><div class="kv" id="kv-i">Rp 0</div><div class="km" id="km-i">0 <span data-i18n="trx_label">Transactions</span></div></div>
-          <div class="kc ke"><div class="kl"><i data-lucide="arrow-up-circle"></i><span data-i18n="expense">Expense</span></div><div class="kv" id="kv-e">Rp 0</div><div class="km" id="km-e">0 <span data-i18n="trx_label">Transactions</span></div></div>
-          <div class="kc kb"><div class="kl"><i data-lucide="wallet"></i><span data-i18n="total_balance">Total Balance</span></div><div class="kv" id="kv-b">Rp 0</div><div class="km" data-i18n="all_accounts">All accounts</div></div>
-          <div class="kc kp"><div class="kl"><i data-lucide="calculator"></i><span data-i18n="final_projection">Final Projection</span></div><div class="kv" id="kv-p">Rp 0</div><div class="km" id="km-p" data-i18n="proj_in_out">Projected In − Projected Out</div></div>
-        </div>
-
-        <!-- ACCOUNT MINI CARDS -->
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s3)">
-            <div style="font-size:var(--sm);font-weight:600" data-i18n="nav_accounts">Accounts &amp; Wallets</div>
-            <button class="btn bg bsm" onclick="gv('akun', document.querySelectorAll('.nit')[1])"><i data-lucide="arrow-right"></i><span data-i18n="see_all">See All</span></button>
-          </div>
-          <div class="acc-grid" id="dash-acc"></div>
-        </div>
-
-        <div class="g2">
-          <div class="card" style="display:flex;flex-direction:column">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" id="lbl-cm">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bgld"><i data-lucide="trending-up"></i><span data-i18n="projection">Projection</span></span></div>
-            <div id="prev-cm" style="flex:1"></div>
-            <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:center">
-              <button class="btn bg bsm" onclick="gv('cp')"><i data-lucide="arrow-down"></i><span data-i18n="see_all">See All</span></button>
-            </div>
-          </div>
-          <div class="card" style="display:flex;flex-direction:column">
-            <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" id="lbl-ck">Rp 0 <span data-i18n="projected">projected</span></div></div><span class="badge bora"><i data-lucide="trending-down"></i><span data-i18n="projection">Projection</span></span></div>
-            <div id="prev-ck" style="flex:1"></div>
-            <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:center">
-              <button class="btn bg bsm" onclick="gv('ck')"><i data-lucide="arrow-down"></i><span data-i18n="see_all">See All</span></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div></div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th><th style="text-align:right">Amount</th></tr></thead><tbody id="tb-dash"></tbody></table></div>
-          <div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:center">
-            <button class="btn bg bsm" onclick="gv('income')"><i data-lucide="arrow-down"></i><span data-i18n="see_all">See All</span></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- AKUN -->
-      <div class="view" id="view-akun">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div><div class="pgtit" style="font-size:var(--base)" data-i18n="acc_view_title">Accounts &amp; Wallets</div><div class="pgsub" data-i18n="acc_desc">Manage all your financial accounts</div></div>
-          <button class="btn bp bsm" onclick="openModalAcc()"><i data-lucide="plus"></i><span data-i18n="add_acc_btn">Add Account</span></button>
-        </div>
-        <div class="acc-grid" id="acc-grid-full"></div>
-
-        <!-- Per-account transactions -->
-        <div class="card" id="acc-trx-card" style="display:none">
-          <div class="ch">
-            <div><div class="ct" id="acc-trx-title">Transaksi</div><div class="cs" id="acc-trx-sub"></div></div>
-            <button class="btn bg bsm" onclick="document.getElementById('acc-trx-card').style.display='none'"><i data-lucide="x"></i><span data-i18n="close">Close</span></button>
-          </div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="category">Category</th><th data-i18n="date">Date</th><th data-i18n="note">Note</th><th style="text-align:right">Amount</th></tr></thead><tbody id="tb-acc-trx"></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- PEMASUKAN -->
-      <div class="view" id="view-income">
-        <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="nav_income">Income</div><div class="cs" data-i18n="inc_desc">Income that has been received</div></div><button class="btn bp bsm" onclick="openModalAs('income')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="date">Date</th><th data-i18n="note">Note</th><th style="text-align:right">Amount</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-i"></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- PENGELUARAN -->
-      <div class="view" id="view-expense">
-        <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="nav_outcome">Expense</div><div class="cs" data-i18n="out_desc">Expenses that have occurred</div></div><button class="btn bp bsm" onclick="openModalAs('expense')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="date">Date</th><th data-i18n="note">Note</th><th style="text-align:right">Amount</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-e"></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- CALON PEMASUKAN -->
-      <div class="view" id="view-cp">
-        <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="nav_proj_in">Projected Income</div><div class="cs" data-i18n="pi_desc">Income template: can repeat automatically</div></div><button class="btn bp bsm" onclick="openModalAs('projected_income')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="category">Category</th><th data-i18n="account">Account</th><th data-i18n="recurrence">Recurrence</th><th data-i18n="start">Start</th><th data-i18n="limit">Limit</th><th data-i18n="note">Note</th><th style="text-align:right" data-i18n="per_period">Per Period</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-cp"></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- CALON PENGELUARAN -->
-      <div class="view" id="view-ck">
-        <div class="card">
-          <div class="ch"><div><div class="ct" data-i18n="nav_proj_out">Projected Expense</div><div class="cs" data-i18n="po_desc">Subscriptions, installments, debt: can repeat automatically</div></div><button class="btn bp bsm" onclick="openModalAs('projected_expense')"><i data-lucide="plus"></i><span data-i18n="add">Add</span></button></div>
-          <div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="category">Category</th><th data-i18n="account">Account</th><th data-i18n="recurrence">Recurrence</th><th data-i18n="start">Start</th><th data-i18n="limit">Limit</th><th data-i18n="note">Note</th><th style="text-align:right" data-i18n="per_period">Per Period</th><th data-i18n="action">Action</th></tr></thead><tbody id="tb-ck"></tbody></table></div>
-        </div>
-      </div>
-      <!-- LAPORAN -->
-      <div class="view" id="view-laporan">
-        <div class="kg">
-          <div class="kc ki"><div class="kl"><i data-lucide="arrow-down-circle"></i><span data-i18n="actual_income">Actual Income</span></div><div class="kv" id="lv-i">Rp 0</div></div>
-          <div class="kc ke"><div class="kl"><i data-lucide="arrow-up-circle"></i><span data-i18n="actual_expense">Actual Expense</span></div><div class="kv" id="lv-e">Rp 0</div></div>
-          <div class="kc kb"><div class="kl"><i data-lucide="wallet"></i><span data-i18n="actual_balance">Actual Balance</span></div><div class="kv" id="lv-b">Rp 0</div></div>
-          <div class="kc kp"><div class="kl"><i data-lucide="calculator"></i><span data-i18n="final_projection">Final Projection</span></div><div class="kv" id="lv-p">Rp 0</div></div>
-        </div>
-        <div class="g2">
-          <div class="card"><div class="ch"><div class="ct" data-i18n="exp_by_cat">Expense by Category</div></div><div id="lap-ke"></div></div>
-          <div class="card"><div class="ch"><div class="ct" data-i18n="inc_by_cat">Income by Category</div></div><div id="lap-ki"></div></div>
-        </div>
-        <div class="card">
-          <div class="ch"><div class="ct" data-i18n="exp_by_acc">Expense by Account</div><div class="cs" data-i18n="acc_most_used">Which account is most used</div></div>
-          <div id="lap-acc"></div>
-        </div>
-        <div class="card"><div class="ch"><div><div class="ct" data-i18n="neraca_proj">Projection Balance</div><div class="cs" data-i18n="neraca_desc">Actual balance + all projections this period</div></div></div><div id="lap-neraca"></div></div>
-      </div>
-
+      <!-- Modular Views -->
+      <div class="view on" id="view-dashboard"></div>
+      <div class="view" id="view-akun"></div>
+      <div class="view" id="view-income"></div>
+      <div class="view" id="view-expense"></div>
+      <div class="view" id="view-cp"></div>
+      <div class="view" id="view-ck"></div>
+      <div class="view" id="view-laporan"></div>
     </main>
   </div>
 </div>
@@ -590,7 +486,14 @@ tbody tr:last-child td{border-bottom:none}
   <button class="mob-nit" data-view="laporan" onclick="gv('laporan', this)"><i data-lucide="bar-chart-2"></i><span data-i18n="nav_report">Report</span></button>
 </nav>
 
-<script src="i18n.js"></script>
+<script src="/i18n.js"></script>
+<script src="/modules/dashboard.js"></script>
+<script src="/modules/accounts.js"></script>
+<script src="/modules/income.js"></script>
+<script src="/modules/outcome.js"></script>
+<script src="/modules/projected-income.js"></script>
+<script src="/modules/projected-outcome.js"></script>
+<script src="/modules/report.js"></script>
 <script>
 // ===== CONFIG: Ganti dengan URL Vercel kamu =====
 var API = ''; // Same domain: frontend & backend served from same Vercel deployment
@@ -1261,6 +1164,30 @@ document.addEventListener('keydown',function(e){
 
 // ===== RENDER =====
 
+function initModules(){
+  if (!window.FinTrackModules) return;
+  var views = {
+    'view-dashboard': 'dashboard',
+    'view-akun': 'accounts',
+    'view-income': 'income',
+    'view-expense': 'outcome',
+    'view-cp': 'projected-income',
+    'view-ck': 'projected-outcome',
+    'view-laporan': 'report'
+  };
+  Object.keys(views).forEach(function(elId){
+    var modName = views[elId];
+    var el = document.getElementById(elId);
+    var mod = window.FinTrackModules[modName];
+    if (el && mod && typeof mod.template === 'function') {
+      el.innerHTML = mod.template();
+    }
+  });
+  if (typeof updateDOMTranslations === 'function') {
+    updateDOMTranslations();
+  }
+}
+
 function render(){
   var fil = getFiltered();
   var mi=0, me=0, cm=0, ck=0;
@@ -1273,34 +1200,30 @@ function render(){
   var bal = getTotalBalance();
   var netProj = cm - ck;
   var proj = bal + netProj;
-
-  setKV('kv-i',mi); setKV('kv-e',me); setKV('kv-b',bal); setKV('kv-p',proj);
-  setKV('lv-i',mi); setKV('lv-e',me); setKV('lv-b',bal); setKV('lv-p',proj);
-  var kmPEl = document.getElementById('km-p');
-  if (kmPEl) {
-    var sign = netProj >= 0 ? '+' : '-';
-    kmPEl.textContent = t('net_proj_this_month') + ': ' + sign + rpf(Math.abs(netProj));
-  }
-  document.getElementById('km-i').textContent = fil.filter(function(x){return x.type==='income';}).length+' '+t('nav_transaction').toLowerCase();
-  document.getElementById('km-e').textContent = fil.filter(function(x){return x.type==='expense';}).length+' '+t('nav_transaction').toLowerCase();
-  document.getElementById('lbl-cm').textContent = rpf(cm) + ' '+t('nav_proj_in').toLowerCase();
-  document.getElementById('lbl-ck').textContent = rpf(ck) + ' '+t('nav_proj_out').toLowerCase();
-
-  renderAccCards('dash-acc', true);
-  renderAccCards('acc-grid-full', false);
-  
   var sortedDB = fil.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
-  renderPreview('prev-cm', sortedDB.filter(function(trx){return trx.type==='projected_income';}), 'tci');
-  renderPreview('prev-ck', sortedDB.filter(function(trx){return trx.type==='projected_expense';}), 'tce');
-  renderDashTable('tb-dash', sortedDB.slice(0,8));
-  renderSimple('tb-i', sortedDB.filter(function(trx){return trx.type==='income';}));
-  renderSimple('tb-e', sortedDB.filter(function(trx){return trx.type==='expense';}));
-  renderCalon('tb-cp', DB.filter(function(trx){return trx.type==='projected_income';}));
-  renderCalon('tb-ck', DB.filter(function(trx){return trx.type==='projected_expense';}));
-  renderReport(sortedDB, mi, me, bal, cm, ck, proj);
+
+  var ctx = {
+    fil: fil,
+    sortedDB: sortedDB,
+    mi: mi,
+    me: me,
+    cm: cm,
+    ck: ck,
+    bal: bal,
+    netProj: netProj,
+    proj: proj
+  };
+
+  if (window.FinTrackModules) {
+    ['dashboard', 'accounts', 'income', 'outcome', 'projected-income', 'projected-outcome', 'report'].forEach(function(m){
+      var mod = window.FinTrackModules[m];
+      if (mod && typeof mod.render === 'function') {
+        mod.render(ctx);
+      }
+    });
+  }
   lucide.createIcons();
 }
-
 function getTotalBalance(){
   var initBal=0; for(var j=0;j<ACCS.length;j++) initBal+=ACCS[j].init;
   var mi=0,me=0;
@@ -1511,7 +1434,28 @@ function renderReport(fil,mi,me,bal,cm,ck,proj){
   }).join('');
 }
 
-// ===== NAV =====
+// ===== ROUTING & NAV =====
+var VIEW_TO_PATH = {
+  dashboard: '/dashboard',
+  akun: '/accounts',
+  income: '/income',
+  expense: '/outcome',
+  cp: '/projected-income',
+  ck: '/projected-outcome',
+  laporan: '/report'
+};
+var PATH_TO_VIEW = {
+  '/dashboard': 'dashboard',
+  '/accounts': 'akun',
+  '/income': 'income',
+  '/outcome': 'expense',
+  '/projected-income': 'cp',
+  '/projected-outcome': 'ck',
+  '/report': 'laporan',
+  '/home': 'dashboard',
+  '/': 'dashboard',
+  '/app.html': 'dashboard'
+};
 var vmeta={
   dashboard:['nav_dashboard','dash_desc'],
   akun:['nav_accounts','acc_desc'],
@@ -1533,7 +1477,7 @@ function toggleSubmenu(id){
   }
   lucide.createIcons();
 }
-function gv(v,el){
+function gv(v,el,skipPush){
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on');});
   document.querySelectorAll('.nit').forEach(function(x){x.classList.remove('on');});
   document.querySelectorAll('.mob-nit').forEach(function(x){x.classList.remove('on');});
@@ -1556,11 +1500,21 @@ function gv(v,el){
   var m=vmeta[v]||[v,''];
   document.getElementById('ptitle').textContent=t(m[0]);
   document.getElementById('psub').textContent=t(m[1]);
+
+  var targetPath = VIEW_TO_PATH[v] || '/dashboard';
+  if (!skipPush && window.location.pathname !== targetPath) {
+    window.history.pushState({ view: v }, '', targetPath);
+  }
+  document.title = 'FinTrack · ' + t(m[0]);
+
   render();
   if(window.lucide) lucide.createIcons();
 }
+window.addEventListener('popstate', function(e){
+  var view = (e.state && e.state.view) || PATH_TO_VIEW[window.location.pathname] || 'dashboard';
+  gv(view, null, true);
+});
 function setPeriod(p,el){ period=p; document.querySelectorAll('.pt').forEach(function(x){x.classList.remove('on');}); el.classList.add('on'); render(); }
-
 // ===== THEME =====
 window.addEventListener('languageChanged', function() {
   document.getElementById('lang-ind').textContent = currentLang.toUpperCase();
@@ -1622,7 +1576,7 @@ function loadSampleData() {
 function doLogout(auto) {
   if (!auto && !confirm(t('logout_confirm'))) return;
   ['ft_token','ft_user','ft_db','ft_accs'].forEach(function(k){ localStorage.removeItem(k); });
-  window.location.href = 'index.html';
+  window.location.href = '/home';
 }
 function setUserUI() {
   var u = getUser(); if (!u) return;
@@ -1633,7 +1587,22 @@ function setUserUI() {
 
 // ===== INIT =====
 (async function(){
-  if (!getToken()) { window.location.href = 'index.html'; return; }
+  var currentPath = window.location.pathname;
+  if (!getToken()) {
+    var target = '/home';
+    if (currentPath && currentPath !== '/' && currentPath !== '/home' && currentPath !== '/app.html') {
+      target += '?redirect=' + encodeURIComponent(currentPath + window.location.search);
+    }
+    window.location.href = target;
+    return;
+  }
+  initModules();
+  var initView = PATH_TO_VIEW[currentPath] || 'dashboard';
+  var normalizedPath = VIEW_TO_PATH[initView] || '/dashboard';
+  if (window.location.pathname !== normalizedPath) {
+    window.history.replaceState({ view: initView }, '', normalizedPath + window.location.search);
+  }
+  gv(initView, null, true);
   setUserUI();
   loadLS();
   if (DB.length || ACCS.length) render();

@@ -2,22 +2,14 @@ const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { encrypt, decrypt, encryptDeterministic, decryptDeterministic } = require('../services/encryption');
+const { encrypt, encryptDeterministic } = require('../services/encryption');
+const { decryptRow } = require('./helpers');
 
 const router = express.Router();
 router.use(requireAuth);
 
 const TYPES = ['pemasukan','pengeluaran','calon_pemasukan','calon_pengeluaran'];
 const FREQS = ['monthly'];
-
-function decryptRow(row) {
-  if (row.description) row.description = decrypt(row.description);
-  if (row.cat) row.cat = decrypt(row.cat);
-  if (row.note) row.note = decrypt(row.note);
-  if (row.account_name) row.account_name = decrypt(row.account_name);
-  if (row.type) row.type = decryptDeterministic(row.type);
-  return row;
-}
 
 const rules = [
   body('desc').trim().notEmpty().withMessage('Deskripsi wajib diisi.').isLength({ max: 200 }),
@@ -101,78 +93,12 @@ router.get('/summary', async (req, res) => {
     });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Gagal memuat summary.' }); }
 });
-
-router.get('/dashboard', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 ORDER BY t.date DESC, t.id DESC LIMIT 50`,
-      [req.user.id]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat dashboard.' }); }
-});
-
-router.get('/income', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 AND t.type = $2 ORDER BY t.date DESC, t.id DESC`,
-      [req.user.id, encryptDeterministic('pemasukan')]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat income.' }); }
-});
-
-router.get('/outcome', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 AND t.type = $2 ORDER BY t.date DESC, t.id DESC`,
-      [req.user.id, encryptDeterministic('pengeluaran')]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat outcome.' }); }
-});
-
-router.get('/projected-income', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 AND t.type = $2 ORDER BY t.date DESC, t.id DESC`,
-      [req.user.id, encryptDeterministic('calon_pemasukan')]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat projected income.' }); }
-});
-
-router.get('/projected-outcome', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 AND t.type = $2 ORDER BY t.date DESC, t.id DESC`,
-      [req.user.id, encryptDeterministic('calon_pengeluaran')]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat projected outcome.' }); }
-});
-
-router.get('/report', async (req, res) => {
-  try {
-    const r = await query(
-      `SELECT t.*, a.name AS account_name FROM transactions t
-       LEFT JOIN accounts a ON t.acc_id = a.id AND a.user_id = $1
-       WHERE t.user_id = $1 ORDER BY t.date DESC, t.id DESC`,
-      [req.user.id]
-    );
-    res.json(r.rows.map(decryptRow));
-  } catch (e) { res.status(500).json({ error: 'Gagal memuat report.' }); }
-});
+router.use('/dashboard', require('./dashboard'));
+router.use('/income', require('./income'));
+router.use('/outcome', require('./outcome'));
+router.use('/projected-income', require('./projected-income'));
+router.use('/projected-outcome', require('./projected-outcome'));
+router.use('/report', require('./report'));
 
 router.post('/auto-process', async (req, res) => {
   try {
@@ -328,4 +254,5 @@ router.delete('/:id', param('id').isInt(), async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Gagal menghapus transaksi.' }); }
 });
 
+router.decryptRow = decryptRow;
 module.exports = router;

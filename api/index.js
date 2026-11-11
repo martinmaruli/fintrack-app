@@ -34,15 +34,28 @@ app.use(rateLimit({
 }));
 
 // API routes
-app.use('/api/auth',         require('../routes/auth'));
-app.use('/api/accounts',     require('../routes/accounts'));
-app.use('/api/transactions', require('../routes/transactions'));
+app.use('/api/auth',              require('../routes/auth'));
+app.use('/api/accounts',          require('../routes/accounts'));
+app.use('/api/dashboard',         require('../routes/dashboard'));
+app.use('/api/income',            require('../routes/income'));
+app.use('/api/outcome',           require('../routes/outcome'));
+app.use('/api/projected-income',  require('../routes/projected-income'));
+app.use('/api/projected-outcome', require('../routes/projected-outcome'));
+app.use('/api/report',             require('../routes/report'));
+app.use('/api/transactions',      require('../routes/transactions'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
 // Catch-all for unknown API paths
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Endpoint tidak ditemukan.' }));
 
+// Serve static assets and handle clean URL page fallbacks for local server parity
+const publicDir = path.join(__dirname, '../public');
+app.use(express.static(publicDir));
+
+const cleanAppPaths = ['/dashboard', '/accounts', '/income', '/outcome', '/projected-income', '/projected-outcome', '/report'];
+app.get(['/', '/home'], (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
+app.get(cleanAppPaths, (_req, res) => res.sendFile(path.join(publicDir, 'app.html')));
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: 'Terjadi kesalahan server.' });
