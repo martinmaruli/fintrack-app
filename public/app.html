@@ -888,8 +888,43 @@ var CUSTOM_CAT_DICT = {
   'Vacation': { en: 'Vacation', id: 'Liburan' },
   'Hewan': { en: 'Pets', id: 'Hewan' },
   'Pet': { en: 'Pets', id: 'Hewan' },
-  'Pets': { en: 'Pets', id: 'Hewan' }
+  'Pets': { en: 'Pets', id: 'Hewan' },
+  'ngopi': { en: 'Coffee', id: 'Ngopi' },
+  'Ngopi': { en: 'Coffee', id: 'Ngopi' },
+  'ngeteh': { en: 'Tea', id: 'Ngeteh' },
+  'Ngeteh': { en: 'Tea', id: 'Ngeteh' },
+  'nongkrong': { en: 'Hangout', id: 'Nongkrong' },
+  'Nongkrong': { en: 'Hangout', id: 'Nongkrong' },
+  'makan': { en: 'Dining', id: 'Makan' },
+  'Makan': { en: 'Dining', id: 'Makan' },
+  'parkir': { en: 'Parking', id: 'Parkir' },
+  'Parkir': { en: 'Parking', id: 'Parkir' },
+  'ojol': { en: 'Ride Hailing', id: 'Ojol' },
+  'Ojol': { en: 'Ride Hailing', id: 'Ojol' },
+  'kuota': { en: 'Data Plan', id: 'Kuota' },
+  'Kuota': { en: 'Data Plan', id: 'Kuota' },
+  'laundry': { en: 'Laundry', id: 'Laundry' },
+  'Laundry': { en: 'Laundry', id: 'Laundry' },
+  'kos': { en: 'Boarding / Rent', id: 'Kos' },
+  'kost': { en: 'Boarding / Rent', id: 'Kost' },
+  'Kost': { en: 'Boarding / Rent', id: 'Kost' },
+  'skincare': { en: 'Skincare', id: 'Skincare' },
+  'Skincare': { en: 'Skincare', id: 'Skincare' },
+  'obat': { en: 'Medicine', id: 'Obat' },
+  'Obat': { en: 'Medicine', id: 'Obat' },
+  'snack': { en: 'Snacks', id: 'Camilan' },
+  'Snack': { en: 'Snacks', id: 'Camilan' }
 };
+function cleanCatText(text) {
+  if (!text) return '';
+  var s = String(text).trim();
+  s = s.replace(/[?!.,;:_#@*&^%$~`|/\\]+$/g, '').trim();
+  var lower = s.toLowerCase();
+  if (lower === 'having tea' || lower === 'drink tea' || lower === 'drinking tea' || lower === 'to drink tea') return 'Tea';
+  if (lower === 'having coffee' || lower === 'drink coffee' || lower === 'drinking coffee' || lower === 'to drink coffee') return 'Coffee';
+  if (lower.startsWith('to ')) s = s.slice(3).trim();
+  return s.split(' ').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+}
 async function fetchCatTranslation(word) {
   if (!word || typeof word !== 'string') return;
   var w = word.trim();
@@ -910,10 +945,11 @@ async function fetchCatTranslation(word) {
     if (res.ok) {
       var data = await res.json();
       if (data && data.responseData && data.responseData.translatedText) {
-        var trans = data.responseData.translatedText.trim();
-        if (trans && !trans.toLowerCase().includes('mymemory')) {
+        var rawTrans = data.responseData.translatedText.trim();
+        if (rawTrans && !rawTrans.toLowerCase().includes('mymemory')) {
+          var trans = cleanCatText(rawTrans);
           cached[lower] = cached[lower] || {};
-          cached[lower][fromLang] = w;
+          cached[lower][fromLang] = cleanCatText(w);
           cached[lower][toLang] = trans;
           localStorage.setItem('ft_custom_trans', JSON.stringify(cached));
           if (typeof render === 'function') render();
@@ -933,13 +969,13 @@ function tCat(c) {
   var lang = (typeof currentLang !== 'undefined' && currentLang === 'id') ? 'id' : 'en';
   for (var dictKey in CUSTOM_CAT_DICT) {
     if (dictKey.toLowerCase() === lower) {
-      return CUSTOM_CAT_DICT[dictKey][lang] || c;
+      return cleanCatText(CUSTOM_CAT_DICT[dictKey][lang] || c);
     }
   }
   try {
     var cached = JSON.parse(localStorage.getItem('ft_custom_trans') || '{}');
     if (cached[lower] && cached[lower][lang]) {
-      return cached[lower][lang];
+      return cleanCatText(cached[lower][lang]);
     }
   } catch(e) {}
   if (!tCat._pending) tCat._pending = {};
@@ -947,7 +983,7 @@ function tCat(c) {
     tCat._pending[lower] = true;
     fetchCatTranslation(c);
   }
-  return c;
+  return cleanCatText(c);
 }
 function rememberCustomCat(c) {
   if (!c || c === 'custom') return;
