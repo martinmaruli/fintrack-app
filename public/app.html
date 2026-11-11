@@ -674,7 +674,7 @@ async function realizeProjected(id) {
       toast(insRes.error || t('toast_save_failed'), 'er');
       return;
     }
-    DB.push(insRes.data);
+    DB.unshift(insRes.data);
     
     // Advance recurring projection date
     trx.date = addDate(trx.date, trx.freq);
@@ -1059,7 +1059,7 @@ function formatAmtForInput(amt) {
 async function saveTrx(data, upd) {
   var res = await apiInsertTrx(data);
   if (res.ok) {
-    DB.push(res.data);
+    DB.unshift(res.data);
     if (res.data.id >= uid) uid = res.data.id + 1;
     saveLS();
     if (upd) { render(); toast(t('toast_trx_added'), 'ok'); }
@@ -1246,7 +1246,7 @@ function showAccTrx(accId) {
   document.getElementById('acc-trx-title').textContent=t('nav_transaction')+': '+a.name;
   document.getElementById('acc-trx-sub').textContent=trxs.length+' '+t('nav_transaction').toLowerCase()+' total';
   if(!trxs.length){el.innerHTML='<tr><td colspan="5"><div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3></div></td></tr>';lucide.createIcons();document.getElementById('acc-trx-card').style.display='';return;}
-  el.innerHTML=trxs.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(trx){
+  el.innerHTML=trxs.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
@@ -1460,7 +1460,7 @@ function render(){
   var bal = getTotalBalance();
   var netProj = cm - ck;
   var proj = bal + netProj;
-  var sortedDB = fil.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var sortedDB = fil.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); });
 
   var ctx = {
     fil: fil,
@@ -1562,7 +1562,7 @@ function renderDashTable(id, list){
 function renderSimple(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="7"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div></td></tr>';return;}
-  el.innerHTML=list.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(trx){
+  el.innerHTML=list.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
