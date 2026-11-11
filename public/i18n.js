@@ -211,6 +211,8 @@ const translations = {
     next_label: "Next:",
     this_month_count: "this month",
     per_month_label: "projected this month",
+    projection: "Projection",
+    projected: "projected",
   },
   id: {
     // Auth & Navigation
@@ -424,6 +426,8 @@ const translations = {
     next_label: "Berikutnya:",
     this_month_count: "bulan ini",
     per_month_label: "diproyeksikan bulan ini",
+    projection: "Proyeksi",
+    projected: "diproyeksikan",
   }
 };
 
