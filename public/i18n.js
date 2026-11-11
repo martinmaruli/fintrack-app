@@ -52,6 +52,7 @@ const translations = {
     // Dashboard Base
     logout: "Logout",
     logout_confirm: "Logout from FinTrack?",
+    logout_desc: "Are you sure you want to log out of your account?",
     add_transaction: "Add Transaction",
     edit_transaction: "Edit Transaction",
     add_account: "Add Account",
@@ -270,6 +271,7 @@ const translations = {
     // Dashboard Base
     logout: "Keluar",
     logout_confirm: "Keluar dari FinTrack?",
+    logout_desc: "Apakah Anda yakin ingin keluar dari akun Anda?",
     add_transaction: "Tambah Transaksi",
     edit_transaction: "Edit Transaksi",
     add_account: "Tambah Akun",

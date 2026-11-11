@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="app_title">FinTrack: Financial Tracker</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
@@ -404,6 +405,18 @@ tbody tr:last-child td{border-bottom:none}
         <button type="submit" class="btn bp"><i data-lucide="check"></i><span data-i18n="save">Save</span></button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- MODAL LOGOUT -->
+<div class="mb hide" id="m-logout">
+  <div class="mo" style="max-width:380px">
+    <div class="mttl"><i data-lucide="log-out" style="color:var(--err)"></i><span data-i18n="logout_confirm">Logout from FinTrack?</span></div>
+    <p style="font-size:var(--sm);color:var(--mut);line-height:1.5;margin-bottom:var(--s5)" data-i18n="logout_desc">Are you sure you want to log out of your account?</p>
+    <div class="fa">
+      <button type="button" class="btn bg" onclick="closeModal('m-logout')" data-i18n="cancel">Cancel</button>
+      <button type="button" class="btn" style="background:var(--err);color:#fff;font-weight:600" onclick="confirmLogout()"><i data-lucide="log-out"></i><span data-i18n="logout">Logout</span></button>
+    </div>
   </div>
 </div>
 
@@ -1155,10 +1168,12 @@ function closeModal(id){
 }
 document.getElementById('m-trx').addEventListener('click',function(e){if(e.target===this)closeModal('m-trx');});
 document.getElementById('m-acc').addEventListener('click',function(e){if(e.target===this)closeModal('m-acc');});
+document.getElementById('m-logout').addEventListener('click',function(e){if(e.target===this)closeModal('m-logout');});
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
     closeModal('m-trx');
     closeModal('m-acc');
+    closeModal('m-logout');
   }
 });
 
@@ -1595,7 +1610,14 @@ function loadSampleData() {
 
 // ===== AUTH =====
 function doLogout(auto) {
-  if (!auto && !confirm(t('logout_confirm'))) return;
+  if (auto) {
+    confirmLogout();
+    return;
+  }
+  document.getElementById('m-logout').classList.remove('hide');
+  if (window.lucide) lucide.createIcons();
+}
+function confirmLogout() {
   ['ft_token','ft_user','ft_db','ft_accs'].forEach(function(k){ localStorage.removeItem(k); });
   window.location.href = '/home';
 }

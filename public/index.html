@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="app_title">FinTrack: Financial Tracker</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -130,7 +131,7 @@ h1 span{color:var(--pri)}
 <div class="mb hide" id="m-auth">
   <div class="mo">
     <div class="mttl"><i data-lucide="log-in"></i><span id="auth-ttl" data-i18n="login_title">Login to FinTrack</span></div>
-    <div class="tabs">
+    <div class="tabs" id="auth-tabs">
       <button type="button" class="tab on" id="tab-in" onclick="switchTab('login')" data-i18n="login">Login</button>
       <button type="button" class="tab" id="tab-reg" onclick="switchTab('register')" data-i18n="register">Register</button>
     </div>
@@ -322,7 +323,8 @@ function switchTab(mode) {
   document.getElementById('m-auth').dataset.mode = mode;
   document.getElementById('grp-pass').style.display = 'block';
   document.getElementById('btn-forgot-pass-div').style.display = isLogin ? 'block' : 'none';
-  
+  var tabsEl = document.getElementById('auth-tabs');
+  if (tabsEl) tabsEl.style.display = 'flex';
   // Reset steps
   document.getElementById('step-1').style.display = 'block';
   document.getElementById('step-otp').style.display = 'none';
@@ -354,6 +356,8 @@ function startForgotPass() {
   var errEl = document.getElementById('auth-err');
   var okEl  = document.getElementById('auth-ok');
   errEl.classList.remove('show'); okEl.classList.remove('show');
+  var tabsEl = document.getElementById('auth-tabs');
+  if (tabsEl) tabsEl.style.display = 'none';
   document.getElementById('m-auth').dataset.mode = 'forgot-pass';
   document.getElementById('grp-pass').style.display = 'none';
   document.getElementById('a-pass').required = false;
@@ -371,6 +375,8 @@ function setStep(step, desc) {
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-otp').style.display = 'none';
   document.getElementById('step-pin').style.display = 'none';
+  var tabsEl = document.getElementById('auth-tabs');
+  if (tabsEl) tabsEl.style.display = 'none';
   document.getElementById('step-reset-pass').style.display = 'none';
   
   document.getElementById('a-email').required = false;
