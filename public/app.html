@@ -1544,15 +1544,36 @@ function toast(msg,type){
 
 // ===== EXPORT =====
 function doExport(){
-  var h=['ID','Description','Amount','Type','Account','Category','Date','Recurring','Frekuensi','MaksUlang','Berakhir','Note'];
-  var rows=DB.map(function(t){
-    var a=getAcc(t.accId);
-    return [t.id,'"'+t.desc+'"',t.amt,t.type,a?a.name:'-',t.cat,t.date,t.rec?'Ya':'Tidak',t.freq||'-',t.cnt||'-',t.endDate||'-','"'+(t.note||'')+'"'].join(',');
+  function escCsv(v){
+    var s = v == null ? '' : String(v);
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  var typeMap = { income: 'Income', expense: 'Expense', projected_income: 'Projected Income', projected_expense: 'Projected Expense' };
+  var h = ['ID', 'Description', 'Amount', 'Type', 'Account', 'Category', 'Date', 'Recurring', 'Frequency', 'Max Repeats', 'End Date', 'Notes'];
+  var sorted = DB.slice().sort(function(a, b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); });
+  var rows = sorted.map(function(t){
+    var a = getAcc(t.accId);
+    return [
+      t.id,
+      escCsv(t.desc),
+      t.amt || 0,
+      escCsv(typeMap[t.type] || t.type),
+      escCsv(a ? a.name : '-'),
+      escCsv(t.cat || '-'),
+      t.date || '-',
+      t.rec ? 'Yes' : 'No',
+      escCsv(getFreqLbl(t.freq) || '-'),
+      t.cnt || '-',
+      escCsv(t.endDate || '-'),
+      escCsv(t.note || '')
+    ].join(',');
   });
-  var csv=[h.join(',')].concat(rows).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='fintrack.csv'; a.click(); toast(''+t('data_exported')+'');
+  var csv = [h.join(',')].concat(rows).join('\r\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = 'fintrack_' + today + '.csv';
+  a.click();
+  toast(t('data_exported'));
 }
 
 
