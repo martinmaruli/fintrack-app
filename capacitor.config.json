@@ -1,0 +1,9 @@
+{
+  "appId": "com.martinmaruli.fintrack",
+  "appName": "FinTrack",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

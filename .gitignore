@@ -3,3 +3,8 @@ node_modules/
 .DS_Store
 .idea/
 *.log
+*.apk
+*.aab
+*.ipa
+android/
+ios/

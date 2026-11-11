@@ -1,0 +1,80 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Add and Sync Capacitor Android
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Configure Android Permissions & Network Security
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            # Ensure usesCleartextTraffic is set to true for API compatibility
+            sed -i 's/<application/<application android:usesCleartextTraffic="true"/' "$MANIFEST"
+          fi
+
+      - name: Build Debug APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Prepare APK Output
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk FinTrack.apk
+          ls -lh FinTrack.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FinTrack-Android-APK
+          path: FinTrack.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        with:
+          tag_name: apk-latest
+          name: "FinTrack Android APK (Latest)"
+          body: |
+            Automated Android build of FinTrack.
+            Download `FinTrack.apk` below and install on Android or upload to testapp.io.
+          files: FinTrack.apk
+          draft: false
+          prerelease: false

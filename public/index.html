@@ -2,9 +2,15 @@
 <html lang="id" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title data-i18n="app_title">FinTrack: Financial Tracker</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#07090e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinTrack">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -123,6 +129,7 @@ h1 span{color:var(--pri)}
   .feats{padding:1.5rem var(--s4) 3rem}
   .mb{align-items:flex-end;padding:0}
   .mo{max-width:100%;border-radius:var(--r2xl) var(--r2xl) 0 0;max-height:85dvh;padding:var(--s5) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+  input,select,textarea,.fi,.fs{font-size:16px!important}
 }
 </style>
 </head>
@@ -277,7 +284,9 @@ h1 span{color:var(--pri)}
 
 <script src="/i18n.js"></script>
 <script>
-var API = ''; // Same domain: frontend & backend served from same Vercel deployment
+// ===== CONFIG =====
+var IS_NATIVE = !!(window.Capacitor || window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && !window.location.port));
+var API = IS_NATIVE ? 'https://fintrackbymartin.vercel.app' : '';
 
 function togglePassword(inputId, iconId) {
   var input = document.getElementById(inputId);
@@ -517,7 +526,8 @@ async function submitAuth(e) {
     } else if (mode === 'set-pin' || mode === 'verify-pin') {
       localStorage.setItem('ft_token', data.token);
       localStorage.setItem('ft_user', JSON.stringify(data.user));
-      var target = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+      var defaultTarget = IS_NATIVE ? '/app.html' : '/dashboard';
+      var target = new URLSearchParams(window.location.search).get('redirect') || defaultTarget;
       window.location.href = target;
     }
   } catch(err) {
@@ -534,11 +544,12 @@ async function submitAuth(e) {
 }
 (function(){
   if (localStorage.getItem('ft_token')) {
-    var target = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+    var defaultTarget = IS_NATIVE ? '/app.html' : '/dashboard';
+    var target = new URLSearchParams(window.location.search).get('redirect') || defaultTarget;
     window.location.href = target;
     return;
   }
-  if (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html')) {
+  if (!IS_NATIVE && (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html'))) {
     window.history.replaceState(null, '', '/home' + window.location.search);
   }
   var m = document.getElementById('m-auth');
@@ -549,6 +560,11 @@ async function submitAuth(e) {
     if (e.key === 'Escape' && m) m.classList.add('hide');
   });
   if (window.lucide) lucide.createIcons();
+  if ('serviceWorker' in navigator && !IS_NATIVE) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
 })();
 </script>
 </body>

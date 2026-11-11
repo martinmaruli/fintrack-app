@@ -2,9 +2,15 @@
 <html lang="id" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title data-i18n="app_title">FinTrack: Financial Tracker</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#07090e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinTrack">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
@@ -226,20 +232,30 @@ tbody tr:last-child td{border-bottom:none}
 
 /* MOBILE BOTTOM NAVIGATION */
 .mob-nav{display:none}
+.mob-only{display:none}
+.mob-tx-tabs{display:none!important}
 
 @media(max-width:768px){
   :root{--sw:0px}
   .sb{display:none}
   .app{grid-template-columns:1fr;height:100dvh}
-  .mw{flex:1;min-height:0;padding-bottom:64px}
-  .tb{padding:var(--s2) var(--s4);gap:var(--s2)}
+  .mw{flex:1;min-height:0;padding-bottom:calc(64px + env(safe-area-inset-bottom, 0px))}
+  .tb{padding:calc(var(--s2) + env(safe-area-inset-top, 0px)) var(--s4) var(--s2);gap:var(--s2)}
+  .mob-only{display:inline-flex}
+  .tc{bottom:calc(76px + env(safe-area-inset-bottom, 0px));right:var(--s4);left:var(--s4);align-items:center}
+  .mob-tx-tabs.vis{display:flex!important;gap:var(--s2);overflow-x:auto;padding-bottom:var(--s1);scrollbar-width:none;-ms-overflow-style:none;flex-shrink:0}
+  .mob-tx-tabs.vis::-webkit-scrollbar{display:none}
+  .mob-tx-tab{display:inline-flex;align-items:center;gap:6px;padding:var(--s2) var(--s3);border-radius:var(--rfl);background:var(--sur);border:1px solid var(--bor);font-size:var(--xs);font-weight:500;color:var(--mut);white-space:nowrap;transition:all var(--tr)}
+  .mob-tx-tab i,.mob-tx-tab svg{width:14px;height:14px}
+  .mob-tx-tab.on{background:var(--prhl);color:var(--pri);border-color:rgba(56,189,248,.35);font-weight:600}
+  input,select,textarea,.fi,.fs{font-size:16px!important}
   .mc{padding:var(--s4);padding-bottom:var(--s6);gap:var(--s4)}
   .kg{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
   .acc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
   .g2{grid-template-columns:1fr;gap:var(--s4)}
   .fr,.fr3{grid-template-columns:1fr}
   .mob-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;
+    display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom, 0px));
     background:var(--sur);border-top:1px solid var(--bor);z-index:90;
     align-items:center;justify-content:space-around;
     padding-bottom:env(safe-area-inset-bottom,0px);
@@ -474,10 +490,19 @@ tbody tr:last-child td{border-bottom:none}
           <i data-lucide="globe" style="width:18px;height:18px"></i> <span style="font-size:12px;font-weight:bold" id="lang-ind">EN</span>
         </button>
         <button class="bic" onclick="toggleTheme()" aria-label="Toggle theme"><i id="tic" data-lucide="moon"></i></button>
+        <button class="bic mob-only" onclick="doExport()" aria-label="Export CSV" title="Export CSV"><i data-lucide="download"></i></button>
+        <button class="bic mob-only" onclick="doLogout()" aria-label="Logout" title="Logout" style="color:var(--err)"><i data-lucide="log-out"></i></button>
       </div>
     </div>
 
     <main class="mc">
+
+      <div class="mob-tx-tabs" id="mob-tx-tabs" style="display:none">
+        <button type="button" class="mob-tx-tab on" data-subview="income" onclick="gv('income', this)"><i data-lucide="arrow-down-circle"></i><span data-i18n="nav_income">Income</span></button>
+        <button type="button" class="mob-tx-tab" data-subview="expense" onclick="gv('expense', this)"><i data-lucide="arrow-up-circle"></i><span data-i18n="nav_outcome">Outcome</span></button>
+        <button type="button" class="mob-tx-tab" data-subview="cp" onclick="gv('cp', this)"><i data-lucide="trending-up"></i><span data-i18n="nav_proj_in">Projected Income</span></button>
+        <button type="button" class="mob-tx-tab" data-subview="ck" onclick="gv('ck', this)"><i data-lucide="trending-down"></i><span data-i18n="nav_proj_out">Projected Outcome</span></button>
+      </div>
 
       <!-- Modular Views -->
       <div class="view on" id="view-dashboard"></div>
@@ -508,9 +533,9 @@ tbody tr:last-child td{border-bottom:none}
 <script src="/modules/projected-outcome.js"></script>
 <script src="/modules/report.js"></script>
 <script>
-// ===== CONFIG: Ganti dengan URL Vercel kamu =====
-var API = ''; // Same domain: frontend & backend served from same Vercel deployment
-
+// ===== CONFIG =====
+var IS_NATIVE = !!(window.Capacitor || window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && !window.location.port));
+var API = IS_NATIVE ? 'https://fintrackbymartin.vercel.app' : '';
 // ===== STATE =====
 var DB = [], ACCS = [], uid = 1, auid = 1, period = 'bulan';
 var n = new Date();
@@ -1778,12 +1803,25 @@ function gv(v,el,skipPush){
     var mobTx = document.querySelector('.mob-nit[data-view="income"]');
     if(mobTx) mobTx.classList.add('on');
   }
+  var mobTxTabs = document.getElementById('mob-tx-tabs');
+  if(mobTxTabs){
+    if(['income','expense','cp','ck'].indexOf(v) !== -1){
+      mobTxTabs.classList.add('vis');
+    } else {
+      mobTxTabs.classList.remove('vis');
+    }
+  }
+  document.querySelectorAll('.mob-tx-tab').forEach(function(x){x.classList.remove('on');});
+  var mobSubBtn = document.querySelector('.mob-tx-tab[data-subview="'+v+'"]');
+  if(mobSubBtn) mobSubBtn.classList.add('on');
   var m=vmeta[v]||[v,''];
   document.getElementById('ptitle').textContent=t(m[0]);
   document.getElementById('psub').textContent=t(m[1]);
 
   var targetPath = VIEW_TO_PATH[v] || '/dashboard';
-  if (!skipPush && window.location.pathname !== targetPath) {
+  if (IS_NATIVE) {
+    try { sessionStorage.setItem('ft_view', v); } catch(e){}
+  } else if (!skipPush && window.location.pathname !== targetPath) {
     window.history.pushState({ view: v }, '', targetPath);
   }
   document.title = 'FinTrack · ' + t(m[0]);
@@ -1886,7 +1924,7 @@ function doLogout(auto) {
 }
 function confirmLogout() {
   ['ft_token','ft_user','ft_db','ft_accs','ft_custom_cats','ft_custom_trans'].forEach(function(k){ localStorage.removeItem(k); });
-  window.location.href = '/home';
+  window.location.href = IS_NATIVE ? '/index.html' : '/home';
 }
 function setUserUI() {
   var u = getUser(); if (!u) return;
@@ -1899,17 +1937,17 @@ function setUserUI() {
 (async function(){
   var currentPath = window.location.pathname;
   if (!getToken()) {
-    var target = '/home';
-    if (currentPath && currentPath !== '/' && currentPath !== '/home' && currentPath !== '/app.html') {
+    var target = IS_NATIVE ? '/index.html' : '/home';
+    if (!IS_NATIVE && currentPath && currentPath !== '/' && currentPath !== '/home' && currentPath !== '/app.html') {
       target += '?redirect=' + encodeURIComponent(currentPath + window.location.search);
     }
     window.location.href = target;
     return;
   }
   initModules();
-  var initView = PATH_TO_VIEW[currentPath] || 'dashboard';
+  var initView = PATH_TO_VIEW[currentPath] || (IS_NATIVE && sessionStorage.getItem('ft_view')) || 'dashboard';
   var normalizedPath = VIEW_TO_PATH[initView] || '/dashboard';
-  if (window.location.pathname !== normalizedPath) {
+  if (!IS_NATIVE && window.location.pathname !== normalizedPath) {
     window.history.replaceState({ view: initView }, '', normalizedPath + window.location.search);
   }
   gv(initView, null, true);
@@ -1920,6 +1958,11 @@ function setUserUI() {
   if (!ok && !DB.length && !ACCS.length) loadSampleData();
   render();
   setTimeout(function(){ lucide.createIcons(); }, 100);
+  if ('serviceWorker' in navigator && !IS_NATIVE) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
 })();
 </script>
 </body>
