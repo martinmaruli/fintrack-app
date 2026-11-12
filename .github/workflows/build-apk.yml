@@ -11,7 +11,9 @@ permissions:
 jobs:
   build-android:
     runs-on: ubuntu-latest
-
+    env:
+      TESTAPPIO_API_TOKEN: ${{ secrets.TESTAPPIO_API_TOKEN }}
+      TESTAPPIO_APP_ID_ANDROID: ${{ secrets.TESTAPPIO_APP_ID_ANDROID }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -39,13 +41,20 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Configure Android Permissions & Network Security
+      - name: Configure Android Version & Permissions
         run: |
+          VERSION_NAME=$(node -p "require('./package.json').version")
+          VERSION_CODE=${{ github.run_number }}
+          echo "Configuring Android Version: $VERSION_NAME (build $VERSION_CODE)"
+          GRADLE_FILE="android/app/build.gradle"
+          if [ -f "$GRADLE_FILE" ]; then
+            sed -i "s/versionCode 1/versionCode $VERSION_CODE/" "$GRADLE_FILE"
+            sed -i "s/versionName \"1.0\"/versionName \"$VERSION_NAME\"/" "$GRADLE_FILE"
+          fi
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if [ -f "$MANIFEST" ]; then
             sed -i 's/<application/<application android:usesCleartextTraffic="true"/' "$MANIFEST"
           fi
-
       - name: Build Debug APK with Gradle
         run: |
           cd android
@@ -66,7 +75,7 @@ jobs:
           retention-days: 30
 
       - name: Upload APK to TestApp.io
-        if: ${{ secrets.TESTAPPIO_API_TOKEN != '' && secrets.TESTAPPIO_APP_ID_ANDROID != '' }}
+        if: env.TESTAPPIO_API_TOKEN != '' && env.TESTAPPIO_APP_ID_ANDROID != ''
         uses: testappio/github-action@v5
         continue-on-error: true
         with:
@@ -77,11 +86,12 @@ jobs:
           notify: true
   build-ios:
     runs-on: macos-latest
-
+    env:
+      TESTAPPIO_API_TOKEN: ${{ secrets.TESTAPPIO_API_TOKEN }}
+      TESTAPPIO_APP_ID_IOS: ${{ secrets.TESTAPPIO_APP_ID_IOS }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -95,6 +105,15 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
+      - name: Configure iOS Version
+        run: |
+          VERSION_NAME=$(node -p "require('./package.json').version")
+          VERSION_CODE=${{ github.run_number }}
+          echo "Configuring iOS Version: $VERSION_NAME (build $VERSION_CODE)"
+          cd ios/App
+          xcrun agvtool new-marketing-version "$VERSION_NAME" || true
+          xcrun agvtool new-version -all "$VERSION_CODE" || true
+
       - name: Build iOS App with Xcode
         run: |
           xcodebuild build \
@@ -106,7 +125,6 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-
       - name: Package IPA
         run: |
           mkdir -p Payload
@@ -123,7 +141,7 @@ jobs:
           retention-days: 30
 
       - name: Upload IPA to TestApp.io
-        if: ${{ secrets.TESTAPPIO_API_TOKEN != '' && secrets.TESTAPPIO_APP_ID_IOS != '' }}
+        if: env.TESTAPPIO_API_TOKEN != '' && env.TESTAPPIO_APP_ID_IOS != ''
         uses: testappio/github-action@v5
         continue-on-error: true
         with:
@@ -132,6 +150,7 @@ jobs:
           file: FinTrack.ipa
           git_release_notes: true
           notify: true
+
   publish-release:
     runs-on: ubuntu-latest
     needs: [build-android, build-ios]

@@ -1,6 +1,6 @@
 {
   "name": "fintrack-app",
-  "version": "1.0.0",
+  "version": "1.1",
   "description": "FinTrack — Personal Finance Tracker (monorepo)",
   "main": "api/index.js",
   "scripts": {
