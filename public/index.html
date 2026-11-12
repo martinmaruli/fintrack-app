@@ -117,20 +117,21 @@ h1 span{color:var(--pri)}
   .showcase-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
-  nav{padding:var(--s3) var(--s4);gap:var(--s2)}
+  nav{padding:calc(var(--s3) + env(safe-area-inset-top, 0px)) var(--s4) var(--s3);gap:var(--s2)}
   .logo{font-size:var(--sm);gap:var(--s2)}
   .logo-ic{width:28px;height:28px}
-  .nav-r{gap:var(--s2)}
-  .nav-r .btn{padding:var(--s1) var(--s3);font-size:var(--xs)}
+  .nav-r{gap:6px}
+  .nav-r .btn{padding:var(--s1) 8px;font-size:11px;min-height:34px;white-space:nowrap}
   .hero-section{padding:2.5rem var(--s4) 2rem}
   h1{font-size:clamp(1.75rem,7vw,2.2rem)}
   .sub{font-size:var(--sm)}
   .btnlg{padding:var(--s2) var(--s4);font-size:var(--sm)}
   .feats{padding:1.5rem var(--s4) 3rem}
-  .mb{align-items:flex-end;padding:0}
-  .mo{max-width:100%;border-radius:var(--r2xl) var(--r2xl) 0 0;max-height:85dvh;padding:var(--s5) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+  .mb{align-items:center;justify-content:center;padding:var(--s4)}
+  .mo{max-width:440px;width:100%;border-radius:var(--r2xl);max-height:90dvh;overflow-y:auto;padding:var(--s5) var(--s4);margin:auto}
   input,select,textarea,.fi,.fs{font-size:16px!important}
 }
+footer{text-align:center;padding:var(--s6) var(--s4) calc(var(--s8) + env(safe-area-inset-bottom,0px));color:var(--fnt);font-size:var(--xs)}
 </style>
 </head>
 <body>
@@ -280,7 +281,7 @@ h1 span{color:var(--pri)}
   </div>
 </section>
 
-<footer data-i18n="footer">© 2026 FinTrack · Focused financial clarity</footer>
+<footer data-i18n="footer">© 2026 FinTrack</footer>
 
 <script src="/i18n.js"></script>
 <script>

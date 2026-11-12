@@ -47,7 +47,7 @@ const translations = {
     f5_s: "Data stored in the cloud, access from phone, laptop, or tablet anytime.",
     f6_t: "Secure & Encrypted",
     f6_s: "Passwords are hashed with bcrypt. Your data cannot be accessed by others.",
-    footer: "© 2026 FinTrack · Focused financial clarity",
+    footer: "© 2026 FinTrack",
 
     // Dashboard Base
     logout: "Logout",
@@ -281,7 +281,7 @@ const translations = {
     f5_s: "Data tersimpan di cloud, buka dari HP, laptop, atau tablet kapan saja.",
     f6_t: "Aman & Terenkripsi",
     f6_s: "Password di-hash dengan bcrypt. Data kamu tidak bisa diakses orang lain.",
-    footer: "© 2026 FinTrack · Keuangan lebih teratur dan terencana",
+    footer: "© 2026 FinTrack",
 
     // Dashboard Base
     logout: "Keluar",

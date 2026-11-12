@@ -164,7 +164,12 @@ tbody tr:last-child td{border-bottom:none}
 .fgrp{display:flex;flex-direction:column;gap:var(--s1)}
 .fl{font-size:var(--xs);font-weight:600;color:var(--mut)}
 .fl .fh{font-weight:400;color:var(--fnt)}
-.fi,.fs{background:var(--off);border:1px solid var(--bor);border-radius:var(--rlg);padding:var(--s2) var(--s3);font-size:var(--sm);color:var(--txt);width:100%;transition:border-color var(--tr),box-shadow var(--tr);min-height:42px}
+.fi,.fs{background:var(--off);border:1px solid var(--bor);border-radius:var(--rlg);padding:var(--s2) var(--s3);font-size:var(--sm);color:var(--txt);width:100%;transition:border-color var(--tr),box-shadow var(--tr);height:42px;min-height:42px;max-height:42px;box-sizing:border-box}
+textarea.fi{height:auto;max-height:none;min-height:76px;line-height:1.4}
+input[type="date"].fi{-webkit-appearance:none;appearance:none;height:42px;min-height:42px;max-height:42px;box-sizing:border-box;padding:0 var(--s3);display:flex;align-items:center}
+input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px;margin:0;text-align:left}
+.desc-cell{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mob-amt{display:none}
 .fi:focus,.fs:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--prhl)}
 .fi::placeholder{color:var(--fnt)}
 .fa{display:flex;gap:var(--s3);justify-content:flex-end;margin-top:var(--s2)}
@@ -249,6 +254,7 @@ tbody tr:last-child td{border-bottom:none}
   .mob-tx-tab i,.mob-tx-tab svg{width:14px;height:14px}
   .mob-tx-tab.on{background:var(--prhl);color:var(--pri);border-color:rgba(56,189,248,.35);font-weight:600}
   input,select,textarea,.fi,.fs{font-size:16px!important}
+  .mob-amt{display:inline-block;margin-left:4px;font-size:11px;font-weight:700;padding:1px 6px;border-radius:var(--rsm);background:rgba(255,255,255,.06);white-space:nowrap}
   .mc{padding:var(--s4);padding-bottom:var(--s6);gap:var(--s4)}
   .kg{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
   .acc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
@@ -1290,7 +1296,8 @@ function showAccTrx(accId) {
   document.getElementById('acc-trx-sub').textContent=trxs.length+' '+t('nav_transaction').toLowerCase()+' total';
   if(!trxs.length){el.innerHTML='<tr><td colspan="5"><div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3></div></td></tr>';lucide.createIcons();document.getElementById('acc-trx-card').style.display='';return;}
   el.innerHTML=trxs.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
-    return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
+    var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
+    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong><span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
@@ -1596,7 +1603,7 @@ function renderDashTable(id, list){
     var ti=typeInfo(trx.type);
     var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
     var recB=trx.rec?'&nbsp;<span class="badge brec" style="font-size:10px"><i data-lucide="repeat"></i>'+getFreqLbl(trx.freq)+'</span>':'';
-    return '<tr><td><strong>'+esc(trx.desc)+'</strong>'+recB+'</td>'
+    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong>'+recB+'<span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td><span class="badge '+ti[1]+'">'+ti[0]+'</span></td>'
@@ -1609,7 +1616,8 @@ function renderSimple(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="7"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div></td></tr>';return;}
   el.innerHTML=list.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
-    return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
+    var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
+    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong><span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
@@ -1646,7 +1654,7 @@ function renderCalon(id, list){
     else if (isPaused) statBadge = ' <span class="badge bwrn" style="font-size:10px">'+t('paused_label')+'</span>';
 
     return '<tr>'
-      +'<td><strong>'+esc(trx.desc)+'</strong>'+statBadge+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
+      +'<td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong>'+statBadge+'<span class="mob-amt ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</span></div>'+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td>'+recL+'</td><td style="color:var(--mut)">'+fd(trx.date)+'</td>'
