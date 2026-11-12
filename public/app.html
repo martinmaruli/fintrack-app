@@ -1317,12 +1317,15 @@ function showAccTrx(accId) {
   document.getElementById('acc-trx-title').textContent=t('nav_transaction')+': '+a.name;
   document.getElementById('acc-trx-sub').textContent=trxs.length+' '+t('nav_transaction').toLowerCase()+' total';
   if(!trxs.length){el.innerHTML='<tr><td colspan="5"><div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3></div></td></tr>';lucide.createIcons();document.getElementById('acc-trx-card').style.display='';return;}
+  var mob = isMobileViewport();
   el.innerHTML=trxs.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
+    var amtTd = '<td class="ta '+(trx.type==='income'?'ti':'te')+'" style="'+(mob?'white-space:nowrap':'text-align:right;white-space:nowrap')+'">'+(trx.type==='income'?'+':'-')+rpf(trx.amt)+'</td>';
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
-      +'<td class="ta '+(trx.type==='income'?'ti':'te')+'" style="white-space:nowrap">'+(trx.type==='income'?'+':'-')+rpf(trx.amt)+'</td>'
+      +(mob ? amtTd : '')
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
-      +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td></tr>';
+      +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
+      +(mob ? '' : amtTd)+'</tr>';
   }).join('');
   document.getElementById('acc-trx-card').style.display='';
   lucide.createIcons();
@@ -1498,6 +1501,19 @@ document.addEventListener('keydown',function(e){
 
 // ===== RENDER =====
 
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.innerWidth <= 768;
+}
+window.isMobileViewport = isMobileViewport;
+var _lastIsMobile = isMobileViewport();
+window.addEventListener('resize', function() {
+  var nowMob = isMobileViewport();
+  if (nowMob !== _lastIsMobile) {
+    _lastIsMobile = nowMob;
+    initModules();
+    render();
+  }
+});
 function initModules(){
   if (!window.FinTrackModules) return;
   var views = {
@@ -1620,29 +1636,35 @@ function amtCls(t){ return {income:'ti',expense:'te',projected_income:'tci',proj
 function renderDashTable(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="6"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3><p>'+t('click_add_trx')+'</p></div></td></tr>';return;}
+  var mob = isMobileViewport();
   el.innerHTML=list.map(function(trx){
     var ti=typeInfo(trx.type);
     var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
     var recB=trx.rec?'&nbsp;<span class="badge brec" style="font-size:10px"><i data-lucide="repeat"></i>'+getFreqLbl(trx.freq)+'</span>':'';
+    var amtTd = '<td class="ta '+amtCls(trx.type)+'" style="'+(mob?'white-space:nowrap':'text-align:right;white-space:nowrap')+'">'+sign+rpf(trx.amt)+'</td>';
     return '<tr><td><strong>'+esc(trx.desc)+'</strong>'+recB+'</td>'
-      +'<td class="ta '+amtCls(trx.type)+'" style="white-space:nowrap">'+sign+rpf(trx.amt)+'</td>'
+      +(mob ? amtTd : '')
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td><span class="badge '+ti[1]+'">'+ti[0]+'</span></td>'
-      +'<td style="color:var(--mut)">'+fd(trx.date)+'</td></tr>';
+      +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
+      +(mob ? '' : amtTd)+'</tr>';
   }).join('');
 }
 
 function renderSimple(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="7"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div></td></tr>';return;}
+  var mob = isMobileViewport();
   el.innerHTML=list.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
+    var amtTd = '<td class="ta '+amtCls(trx.type)+'" style="'+(mob?'white-space:nowrap':'text-align:right;white-space:nowrap')+'">'+rpf(trx.amt)+'</td>';
     return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
-      +'<td class="ta '+amtCls(trx.type)+'" style="white-space:nowrap">'+rpf(trx.amt)+'</td>'
+      +(mob ? amtTd : '')
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
+      +(mob ? '' : amtTd)
       +'<td><div style="display:flex;gap:var(--s1)">'
       +'<button class="btn bg bsm" onclick="editTrx('+trx.id+')"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>'
       +'<button class="btn bd bsm" onclick="delTrx('+trx.id+')"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>'
@@ -1653,6 +1675,7 @@ function renderSimple(id, list){
 function renderCalon(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="9"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div></td></tr>';return;}
+  var mob = isMobileViewport();
   var r=getRange();
   var n=new Date(), y=n.getFullYear(), m=n.getMonth();
   var eom = y + '-' + String(m+1).padStart(2,'0') + '-' + String(new Date(y, m+1, 0).getDate()).padStart(2,'0');
@@ -1673,15 +1696,17 @@ function renderCalon(id, list){
     if (isStopped) statBadge = ' <span class="badge berr" style="font-size:10px">'+t('stopped_label')+'</span>';
     else if (isPaused) statBadge = ' <span class="badge bwrn" style="font-size:10px">'+t('paused_label')+'</span>';
 
+    var amtTd = '<td style="'+(mob?'white-space:nowrap':'text-align:right;white-space:nowrap')+'"><div class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</div>'+(occ.length>1?'<div style="font-size:var(--xs);color:var(--mut)">'+occ.length+'× = '+rpf(ptotal)+'</div>':'')+'</td>';
+
     return '<tr>'
       +'<td><strong>'+esc(trx.desc)+'</strong>'+statBadge+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
-      +'<td style="white-space:nowrap"><div class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</div>'+(occ.length>1?'<div style="font-size:var(--xs);color:var(--mut)">'+occ.length+'× = '+rpf(ptotal)+'</div>':'')+'</td>'
+      +(mob ? amtTd : '')
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td>'+recL+'</td><td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+limL+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
-
+      +(mob ? '' : amtTd)
       +'<td><div style="display:flex;gap:var(--s1)">'
       +'<button class="btn bg bsm" onclick="realizeProjected('+trx.id+')" title="'+t('realize_btn')+'"><i data-lucide="check-circle" style="width:12px;height:12px;color:var(--suc)"></i></button>'
       +'<button class="btn bg bsm" onclick="togglePause('+trx.id+')" title="Pause/Resume"><i data-lucide="'+(isPaused||isStopped?'play':'pause')+'" style="width:12px;height:12px"></i></button>'

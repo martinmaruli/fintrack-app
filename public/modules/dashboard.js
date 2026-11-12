@@ -2,6 +2,10 @@ window.FinTrackModules = window.FinTrackModules || {};
 
 window.FinTrackModules.dashboard = {
   template: function() {
+    var mob = typeof isMobileViewport === 'function' && isMobileViewport();
+    var ths = mob
+      ? '<th data-i18n="desc">Description</th><th data-i18n="amount">Amount</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th>'
+      : '<th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th><th style="text-align:right" data-i18n="amount">Amount</th>';
     return '<div class="kg">'
       + '<div class="kc ki"><div class="kl"><i data-lucide="arrow-down-circle"></i><span data-i18n="income">Income</span></div><div class="kv" id="kv-i">Rp 0</div><div class="km" id="km-i">0 <span data-i18n="trx_label">Transactions</span></div></div>'
       + '<div class="kc ke"><div class="kl"><i data-lucide="arrow-up-circle"></i><span data-i18n="expense">Expense</span></div><div class="kv" id="kv-e">Rp 0</div><div class="km" id="km-e">0 <span data-i18n="trx_label">Transactions</span></div></div>'
@@ -17,7 +21,7 @@ window.FinTrackModules.dashboard = {
       + '</div>'
       + '<div class="card">'
       + '<div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div></div>'
-      + '<div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="amount">Amount</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th></tr></thead><tbody id="tb-dash"></tbody></table></div>'
+      + '<div class="tw"><table><thead><tr>' + ths + '</tr></thead><tbody id="tb-dash"></tbody></table></div>'
       + '<div style="margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--div);display:flex;justify-content:center">'
       + '<button class="btn bg bsm" onclick="gv(\'income\')"><i data-lucide="arrow-down"></i><span data-i18n="see_all">See All</span></button>'
       + '</div>'

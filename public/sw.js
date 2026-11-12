@@ -1,4 +1,4 @@
-var CACHE_NAME = 'fintrack-cache-v2';
+var CACHE_NAME = 'fintrack-cache-v3';
 var STATIC_ASSETS = [
   '/',
   '/home',
