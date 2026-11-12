@@ -14,7 +14,7 @@ window.FinTrackModules.report = {
       + '</div>'
       + '<div class="card">'
       + '<div class="ch"><div><div class="ct" data-i18n="recent_trx">Recent Transactions</div><div class="cs" data-i18n="recent_act">Recent activity</div></div></div>'
-      + '<div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th><th style="text-align:right">Amount</th></tr></thead><tbody id="tb-report-recent"></tbody></table></div>'
+      + '<div class="tw"><table><thead><tr><th data-i18n="desc">Description</th><th data-i18n="amount">Amount</th><th data-i18n="account">Account</th><th data-i18n="category">Category</th><th data-i18n="type">Type</th><th data-i18n="date">Date</th></tr></thead><tbody id="tb-report-recent"></tbody></table></div>'
       + '</div>'
       + '<div class="g2">'
       + '<div class="card"><div class="ch"><div class="ct" data-i18n="exp_by_cat">Expense by Category</div></div><div id="lap-ke"></div></div>'

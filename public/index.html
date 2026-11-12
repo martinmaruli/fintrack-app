@@ -8,7 +8,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#07090e">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="FinTrack">
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
@@ -132,7 +132,23 @@ h1 span{color:var(--pri)}
   input,select,textarea,.fi,.fs{font-size:16px!important}
 }
 footer{text-align:center;padding:var(--s6) var(--s4) calc(var(--s8) + env(safe-area-inset-bottom,0px));color:var(--fnt);font-size:var(--xs)}
+html.ios-standalone nav{padding-top:max(calc(env(safe-area-inset-top, 0px) + 16px), 62px)}
 </style>
+<script>
+function fixStandaloneViewport() {
+  var isStandalone = !!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches));
+  if (isStandalone) {
+    document.documentElement.classList.add('ios-standalone');
+    if (window.screen && window.screen.height > window.innerHeight) {
+      var h = window.screen.height + 'px';
+      document.documentElement.style.height = h;
+      document.body.style.height = h;
+    }
+  }
+}
+fixStandaloneViewport();
+window.addEventListener('resize', fixStandaloneViewport);
+</script>
 </head>
 <body>
 
@@ -532,7 +548,8 @@ async function submitAuth(e) {
       window.location.href = target;
     }
   } catch(err) {
-    errEl.textContent = err.message;
+    errEl.dataset.rawError = err.message;
+    errEl.textContent = typeof translateError === 'function' ? translateError(err.message) : err.message;
     errEl.classList.add('show');
   }
   btn.disabled = false;

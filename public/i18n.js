@@ -24,6 +24,22 @@ const translations = {
 
     // Auth Messages
     err_occurred: "An error occurred.",
+    err_wrong_credentials: "Incorrect email or password.",
+    err_wrong_pin: "Incorrect PIN.",
+    err_invalid_pin_length: "Invalid input. PIN must be 6 digits.",
+    err_wrong_otp: "Incorrect or expired OTP.",
+    err_session_expired: "Session expired or invalid. Please login again.",
+    err_email_registered: "Email is already registered.",
+    err_email_unverified: "Email is not verified yet. Check your email for a new OTP.",
+    err_invalid_email: "Invalid email format.",
+    err_pass_min: "Password must be at least 8 characters.",
+    err_pass_upper: "Password must contain an uppercase letter.",
+    err_pass_num: "Password must contain a number.",
+    err_pass_invalid: "Invalid password (minimum 8 characters, with an uppercase letter and a number).",
+    err_rate_limit: "Too many attempts. Please try again in 15 minutes.",
+    err_server: "Server error occurred.",
+    err_user_not_found: "User not found.",
+    err_email_required: "Email is required.",
     reg_success: "OTP has been sent to your email.",
     email_verified: "Email verified. Please create a PIN.",
 
@@ -258,6 +274,22 @@ const translations = {
 
     // Auth Messages
     err_occurred: "Terjadi kesalahan.",
+    err_wrong_credentials: "Email atau password salah.",
+    err_wrong_pin: "PIN salah.",
+    err_invalid_pin_length: "Input tidak valid. PIN harus 6 digit.",
+    err_wrong_otp: "OTP salah atau sudah kedaluwarsa.",
+    err_session_expired: "Sesi kedaluwarsa atau tidak valid.",
+    err_email_registered: "Email sudah terdaftar.",
+    err_email_unverified: "Email belum diverifikasi. Cek email untuk OTP baru.",
+    err_invalid_email: "Format email tidak valid.",
+    err_pass_min: "Password minimal 8 karakter.",
+    err_pass_upper: "Password harus mengandung huruf kapital.",
+    err_pass_num: "Password harus mengandung angka.",
+    err_pass_invalid: "Password tidak valid (minimal 8 karakter, ada huruf kapital dan angka).",
+    err_rate_limit: "Terlalu banyak percobaan. Coba lagi 15 menit lagi.",
+    err_server: "Terjadi kesalahan server.",
+    err_user_not_found: "User tidak ditemukan.",
+    err_email_required: "Email diperlukan.",
     reg_success: "OTP telah dikirim ke email Anda.",
     email_verified: "Email terverifikasi. Silakan buat PIN.",
 
@@ -478,6 +510,36 @@ function t(key, vars = {}) {
   }
   return str;
 }
+function translateError(msg) {
+  if (!msg) return t('err_occurred');
+  const str = String(msg).trim();
+  const errorMap = {
+    'Email atau password salah.': 'err_wrong_credentials',
+    'PIN salah.': 'err_wrong_pin',
+    'Invalid input. PIN must be 6 digits.': 'err_invalid_pin_length',
+    'Input tidak valid. PIN harus 6 digit.': 'err_invalid_pin_length',
+    'OTP salah atau sudah kedaluwarsa.': 'err_wrong_otp',
+    'Sesi kedaluwarsa atau tidak valid.': 'err_session_expired',
+    'Email sudah terdaftar.': 'err_email_registered',
+    'Email belum diverifikasi. Cek email untuk OTP baru.': 'err_email_unverified',
+    'Format email tidak valid.': 'err_invalid_email',
+    'Password minimal 8 karakter.': 'err_pass_min',
+    'Password harus mengandung huruf kapital.': 'err_pass_upper',
+    'Password harus mengandung angka.': 'err_pass_num',
+    'Password tidak valid (minimal 8 karakter, ada huruf kapital dan angka).': 'err_pass_invalid',
+    'Terlalu banyak percobaan. Coba lagi 15 menit lagi.': 'err_rate_limit',
+    'Terjadi kesalahan server.': 'err_server',
+    'User tidak ditemukan.': 'err_user_not_found',
+    'Email diperlukan.': 'err_email_required',
+    'Missing token or OTP': 'err_session_expired',
+    'Missing token or PIN': 'err_session_expired',
+    'Missing token': 'err_session_expired',
+    'An error occurred.': 'err_occurred',
+    'Terjadi kesalahan.': 'err_occurred'
+  };
+  const key = errorMap[str];
+  return key ? t(key) : str;
+}
 
 function setLanguage(lang) {
   currentLang = lang;
@@ -492,6 +554,11 @@ function toggleLanguage() {
 }
 
 function updateDOMTranslations() {
+  document.documentElement.lang = currentLang;
+  const authErrEl = document.getElementById('auth-err');
+  if (authErrEl && authErrEl.dataset.rawError && authErrEl.classList.contains('show')) {
+    authErrEl.textContent = translateError(authErrEl.dataset.rawError);
+  }
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const val = translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : null;
@@ -528,6 +595,12 @@ function applyFormValidationTranslations() {
         if (!e.target.validity.valid) {
           if (e.target.validity.valueMissing) {
             e.target.setCustomValidity(t('fill_this_field'));
+          } else if (e.target.validity.tooShort) {
+            e.target.setCustomValidity(t('err_pass_min'));
+          } else if (e.target.validity.patternMismatch) {
+            e.target.setCustomValidity(t('err_invalid_pin_length'));
+          } else if (e.target.validity.typeMismatch) {
+            e.target.setCustomValidity(t('err_invalid_email'));
           }
         }
       });

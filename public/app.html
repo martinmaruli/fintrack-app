@@ -8,7 +8,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#07090e">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="FinTrack">
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,8 +52,8 @@
   --sh3:0 24px 60px rgba(0,0,0,.7),0 8px 24px rgba(0,0,0,.4);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
-body{font-family:var(--font);font-size:var(--sm);color:var(--txt);background:radial-gradient(ellipse at 20% 0%,rgba(56,189,248,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(99,102,241,.1) 0%,transparent 50%),var(--bg);height:100%;overflow:hidden}
+html{-webkit-font-smoothing:antialiased;width:100%;height:100dvh;min-height:100vh;min-height:-webkit-fill-available;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font);font-size:var(--sm);color:var(--txt);background:radial-gradient(ellipse at 20% 0%,rgba(56,189,248,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(99,102,241,.1) 0%,transparent 50%),var(--bg);width:100%;height:100dvh;min-height:100vh;min-height:-webkit-fill-available;overflow:hidden}
 button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 input,select{font:inherit;color:inherit}
 ::selection{background:rgba(56,189,248,.25)}
@@ -81,6 +81,7 @@ input,select{font:inherit;color:inherit}
 .tb{display:flex;align-items:center;justify-content:space-between;padding:var(--s3) var(--s6);background:var(--sur);border-bottom:1px solid var(--bor);gap:var(--s4);flex-shrink:0;flex-wrap:wrap;box-shadow:inset 0 1px 0 var(--spec);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%)}
 .tb-l{display:flex;align-items:center;gap:var(--s3)}
 .tb-r{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
+.tb-acts{display:flex;align-items:center;gap:var(--s2)}
 .pgtit{font-size:var(--base);font-weight:700;letter-spacing:-.01em}
 .pgsub{font-size:var(--xs);color:var(--mut)}
 .mc{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:var(--s6);display:flex;flex-direction:column;gap:var(--s6)}
@@ -168,8 +169,6 @@ tbody tr:last-child td{border-bottom:none}
 textarea.fi{height:auto;max-height:none;min-height:76px;line-height:1.4}
 input[type="date"].fi{-webkit-appearance:none;appearance:none;height:42px;min-height:42px;max-height:42px;box-sizing:border-box;padding:0 var(--s3);display:flex;align-items:center}
 input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px;margin:0;text-align:left}
-.desc-cell{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.mob-amt{display:none}
 .fi:focus,.fs:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--prhl)}
 .fi::placeholder{color:var(--fnt)}
 .fa{display:flex;gap:var(--s3);justify-content:flex-end;margin-top:var(--s2)}
@@ -243,9 +242,15 @@ input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px
 @media(max-width:768px){
   :root{--sw:0px}
   .sb{display:none}
-  .app{grid-template-columns:1fr;height:100dvh}
-  .mw{flex:1;min-height:0;padding-bottom:calc(64px + env(safe-area-inset-bottom, 0px))}
-  .tb{padding:calc(var(--s2) + env(safe-area-inset-top, 0px)) var(--s4) var(--s2);gap:var(--s2)}
+  .desk-only{display:none!important}
+  .app{grid-template-columns:1fr;position:fixed;inset:0;width:100%;height:100%;display:flex;flex-direction:column}
+  .mw{flex:1;min-height:0;padding-bottom:calc(58px + env(safe-area-inset-bottom, 0px))}
+  .tb{flex-direction:column;align-items:stretch;padding:max(calc(env(safe-area-inset-top, 0px) + 12px), var(--s3)) var(--s4) var(--s3);gap:var(--s2)}
+  .tb-l{display:flex;align-items:center;justify-content:flex-start}
+  .tb-r{width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:var(--s2)}
+  .tb-r .pts .pt{padding:4px 10px;font-size:12px;min-height:28px;white-space:nowrap}
+  .tb-acts{display:flex;align-items:center;gap:4px}
+  .tb-acts .bic{padding:6px;min-width:34px;min-height:34px}
   .mob-only{display:inline-flex}
   .tc{bottom:calc(76px + env(safe-area-inset-bottom, 0px));right:var(--s4);left:var(--s4);align-items:center}
   .mob-tx-tabs.vis{display:flex!important;gap:var(--s2);overflow-x:auto;padding-bottom:var(--s1);scrollbar-width:none;-ms-overflow-style:none;flex-shrink:0}
@@ -254,14 +259,13 @@ input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px
   .mob-tx-tab i,.mob-tx-tab svg{width:14px;height:14px}
   .mob-tx-tab.on{background:var(--prhl);color:var(--pri);border-color:rgba(56,189,248,.35);font-weight:600}
   input,select,textarea,.fi,.fs{font-size:16px!important}
-  .mob-amt{display:inline-block;margin-left:4px;font-size:11px;font-weight:700;padding:1px 6px;border-radius:var(--rsm);background:rgba(255,255,255,.06);white-space:nowrap}
   .mc{padding:var(--s4);padding-bottom:var(--s6);gap:var(--s4)}
   .kg{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
   .acc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
   .g2{grid-template-columns:1fr;gap:var(--s4)}
   .fr,.fr3{grid-template-columns:1fr}
   .mob-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom, 0px));
+    display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(58px + env(safe-area-inset-bottom, 0px));
     background:var(--sur);border-top:1px solid var(--bor);z-index:90;
     align-items:center;justify-content:space-around;
     padding-bottom:env(safe-area-inset-bottom,0px);
@@ -286,13 +290,29 @@ input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px
   .mb{align-items:flex-end;padding:0}
   .mo{max-width:100%;border-radius:var(--r2xl) var(--r2xl) 0 0;max-height:85dvh;padding:var(--s5) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
 }
+html.ios-standalone .tb{padding-top:max(calc(env(safe-area-inset-top, 0px) + 16px), 62px)}
+html.ios-standalone .mob-nav{bottom:0;height:62px;padding-bottom:6px}
+html.ios-standalone .mw{padding-bottom:62px}
 @media(max-width:480px){
   .kg{grid-template-columns:1fr;gap:var(--s3)}
   .acc-grid{grid-template-columns:1fr;gap:var(--s3)}
-  .tb-r .btn span{display:none}
-  .tb-r .btn{padding:var(--s2);min-width:38px}
 }
 </style>
+<script>
+function fixStandaloneViewport() {
+  var isStandalone = !!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches));
+  if (isStandalone) {
+    document.documentElement.classList.add('ios-standalone');
+    if (window.screen && window.screen.height > window.innerHeight) {
+      var h = window.screen.height + 'px';
+      document.documentElement.style.height = h;
+      document.body.style.height = h;
+    }
+  }
+}
+fixStandaloneViewport();
+window.addEventListener('resize', fixStandaloneViewport);
+</script>
 </head>
 <body>
 
@@ -486,18 +506,20 @@ input[type="date"]::-webkit-date-and-time-value{line-height:42px;min-height:42px
         </div>
       </div>
       <div class="tb-r">
-        <div style="display:flex;gap:var(--s2)">
+        <div class="pts">
           <button class="pt on" onclick="setPeriod('bulan',this)" data-i18n="this_month">This Month</button>
           <button class="pt" onclick="setPeriod('semua',this)" data-i18n="all">All</button>
         </div>
-        <button class="btn bp bsm" onclick="openModalTrx()"><i data-lucide="plus"></i><span data-i18n="add_transaction">Add Transaction</span></button>
-        <button class="bic" onclick="toggleBalance()" aria-label="Toggle Balance" title="Show/Hide Balance"><i id="bal-ic" data-lucide="eye"></i></button>
-        <button class="bic" onclick="toggleLanguage()" aria-label="Toggle language" title="Switch Language" style="display:flex;align-items:center;gap:4px">
-          <i data-lucide="globe" style="width:18px;height:18px"></i> <span style="font-size:12px;font-weight:bold" id="lang-ind">EN</span>
-        </button>
-        <button class="bic" onclick="toggleTheme()" aria-label="Toggle theme"><i id="tic" data-lucide="moon"></i></button>
-        <button class="bic mob-only" onclick="doExport()" aria-label="Export CSV" title="Export CSV"><i data-lucide="download"></i></button>
-        <button class="bic mob-only" onclick="doLogout()" aria-label="Logout" title="Logout" style="color:var(--err)"><i data-lucide="log-out"></i></button>
+        <button class="btn bp bsm desk-only" onclick="openModalTrx()"><i data-lucide="plus"></i><span data-i18n="add_transaction">Add Transaction</span></button>
+        <div class="tb-acts">
+          <button class="bic" onclick="toggleBalance()" aria-label="Toggle Balance" title="Show/Hide Balance"><i id="bal-ic" data-lucide="eye"></i></button>
+          <button class="bic" onclick="toggleLanguage()" aria-label="Toggle language" title="Switch Language" style="display:flex;align-items:center;gap:4px">
+            <i data-lucide="globe" style="width:18px;height:18px"></i> <span style="font-size:12px;font-weight:bold" id="lang-ind">EN</span>
+          </button>
+          <button class="bic" onclick="toggleTheme()" aria-label="Toggle theme"><i id="tic" data-lucide="moon"></i></button>
+          <button class="bic mob-only" onclick="doExport()" aria-label="Export CSV" title="Export CSV"><i data-lucide="download"></i></button>
+          <button class="bic mob-only" onclick="doLogout()" aria-label="Logout" title="Logout" style="color:var(--err)"><i data-lucide="log-out"></i></button>
+        </div>
       </div>
     </div>
 
@@ -1296,12 +1318,11 @@ function showAccTrx(accId) {
   document.getElementById('acc-trx-sub').textContent=trxs.length+' '+t('nav_transaction').toLowerCase()+' total';
   if(!trxs.length){el.innerHTML='<tr><td colspan="5"><div class="es" style="padding:var(--s8)"><i data-lucide="inbox"></i><h3>'+t('no_trx')+'</h3></div></td></tr>';lucide.createIcons();document.getElementById('acc-trx-card').style.display='';return;}
   el.innerHTML=trxs.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
-    var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
-    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong><span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
+    return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
+      +'<td class="ta '+(trx.type==='income'?'ti':'te')+'" style="white-space:nowrap">'+(trx.type==='income'?'+':'-')+rpf(trx.amt)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
-      +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
-      +'<td style="text-align:right" class="ta '+(trx.type==='income'?'ti':'te')+'">'+(trx.type==='income'?'+':'-')+rpf(trx.amt)+'</td></tr>';
+      +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td></tr>';
   }).join('');
   document.getElementById('acc-trx-card').style.display='';
   lucide.createIcons();
@@ -1603,12 +1624,12 @@ function renderDashTable(id, list){
     var ti=typeInfo(trx.type);
     var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
     var recB=trx.rec?'&nbsp;<span class="badge brec" style="font-size:10px"><i data-lucide="repeat"></i>'+getFreqLbl(trx.freq)+'</span>':'';
-    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong>'+recB+'<span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
+    return '<tr><td><strong>'+esc(trx.desc)+'</strong>'+recB+'</td>'
+      +'<td class="ta '+amtCls(trx.type)+'" style="white-space:nowrap">'+sign+rpf(trx.amt)+'</td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td><span class="badge '+ti[1]+'">'+ti[0]+'</span></td>'
-      +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
-      +'<td style="text-align:right" class="ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</td></tr>';
+      +'<td style="color:var(--mut)">'+fd(trx.date)+'</td></tr>';
   }).join('');
 }
 
@@ -1616,13 +1637,12 @@ function renderSimple(id, list){
   var el=document.getElementById(id);
   if(!list.length){el.innerHTML='<tr><td colspan="7"><div class="es"><i data-lucide="inbox"></i><h3>'+t('no_data')+'</h3></div></td></tr>';return;}
   el.innerHTML=list.slice().sort(function(a,b){ return (b.date || '').localeCompare(a.date || '') || (b.id - a.id); }).map(function(trx){
-    var sign=(trx.type==='income'||trx.type==='projected_income')?'+':'-';
-    return '<tr><td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong><span class="mob-amt ta '+amtCls(trx.type)+'">'+sign+rpf(trx.amt)+'</span></div></td>'
+    return '<tr><td><strong>'+esc(trx.desc)+'</strong></td>'
+      +'<td class="ta '+amtCls(trx.type)+'" style="white-space:nowrap">'+rpf(trx.amt)+'</td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
-      +'<td style="text-align:right" class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</td>'
       +'<td><div style="display:flex;gap:var(--s1)">'
       +'<button class="btn bg bsm" onclick="editTrx('+trx.id+')"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>'
       +'<button class="btn bd bsm" onclick="delTrx('+trx.id+')"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>'
@@ -1654,13 +1674,13 @@ function renderCalon(id, list){
     else if (isPaused) statBadge = ' <span class="badge bwrn" style="font-size:10px">'+t('paused_label')+'</span>';
 
     return '<tr>'
-      +'<td><div class="desc-cell"><strong>'+esc(trx.desc)+'</strong>'+statBadge+'<span class="mob-amt ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</span></div>'+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
+      +'<td><strong>'+esc(trx.desc)+'</strong>'+statBadge+(nextDate!=='-'?'<div class="nd"><i data-lucide="calendar-clock"></i>'+t('next_label')+' '+nextDate+'</div>':'')+'</td>'
+      +'<td style="white-space:nowrap"><div class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</div>'+(occ.length>1?'<div style="font-size:var(--xs);color:var(--mut)">'+occ.length+'× = '+rpf(ptotal)+'</div>':'')+'</td>'
       +'<td><span class="badge bpri">'+esc(tCat(trx.cat))+'</span></td>'
       +'<td>'+accLabel(trx.accId)+'</td>'
       +'<td>'+recL+'</td><td style="color:var(--mut)">'+fd(trx.date)+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+limL+'</td>'
       +'<td style="color:var(--mut);font-size:var(--xs)">'+esc(trx.note||'-')+'</td>'
-      +'<td style="text-align:right"><div class="ta '+amtCls(trx.type)+'">'+rpf(trx.amt)+'</div>'+(occ.length>1?'<div style="font-size:var(--xs);color:var(--mut)">'+occ.length+'× = '+rpf(ptotal)+'</div>':'')+'</td>'
 
       +'<td><div style="display:flex;gap:var(--s1)">'
       +'<button class="btn bg bsm" onclick="realizeProjected('+trx.id+')" title="'+t('realize_btn')+'"><i data-lucide="check-circle" style="width:12px;height:12px;color:var(--suc)"></i></button>'
