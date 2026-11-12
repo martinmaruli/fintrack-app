@@ -474,7 +474,7 @@ async function submitAuth(e) {
     } else if (mode === 'forgot-pass') {
       payload = { email: document.getElementById('a-email').value.trim() };
     } else if (mode === 'verify-otp' || mode === 'verify-reset-otp' || mode === 'verify-pin-otp') {
-      payload = { temp_token: tempToken, otp_code: document.getElementById('a-otp').value };
+      payload = { temp_token: tempToken, otp_code: document.getElementById('a-otp').value.trim() };
     } else if (mode === 'reset-pass') {
       payload = { temp_token: tempToken, password: document.getElementById('a-new-pass').value };
     } else if (mode === 'set-pin' || mode === 'verify-pin') {

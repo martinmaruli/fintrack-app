@@ -18,10 +18,12 @@ async function initTransporter() {
     });
     console.log('Test Email Account Created:', testAccount.user);
   } else {
+    const port = Number(process.env.SMTP_PORT) || 587;
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465;
     transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT || 587,
-      secure: process.env.SMTP_SECURE === 'true',
+      port: port,
+      secure: secure,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -33,8 +35,10 @@ async function initTransporter() {
 
 async function sendOTPEmail(to, code) {
   const t = await initTransporter();
+  const senderEmail = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@fintrack.app';
+  const fromHeader = senderEmail.includes('<') ? senderEmail : `"FinTrack App" <${senderEmail}>`;
   const info = await t.sendMail({
-    from: '"FinTrack App" <noreply@fintrack.app>',
+    from: fromHeader,
     to: to,
     subject: 'Your FinTrack Verification Code',
     text: `Your OTP verification code is: ${code}. It will expire in 10 minutes.`,

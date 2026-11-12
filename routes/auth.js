@@ -75,9 +75,14 @@ router.post('/register', authLimiter, registerRules, async (req, res) => {
     const user = result.rows[0];
     if (user) user.email = decryptDeterministic(user.email);
     
-    // Send email (await it so Vercel doesn't freeze the container before logging)
-    await sendOTPEmail(email, otpCode).catch(err => console.error('Failed to send OTP:', err));
-    
+    // Send email
+    try {
+      await sendOTPEmail(email, otpCode);
+    } catch (mailErr) {
+      console.error('Failed to send OTP:', mailErr);
+      return res.status(500).json({ error: 'Gagal mengirim email OTP: ' + (mailErr.message || 'Periksa konfigurasi SMTP.') });
+    }
+
     // Return temp token for OTP verification step
     return res.status(201).json({ temp_token: signTempToken(user.id, 'otp'), message: 'OTP sent to email' });
   } catch (err) {
@@ -98,7 +103,7 @@ router.post('/verify-otp', async (req, res) => {
     const result = await query('SELECT otp_code, otp_expires_at FROM users WHERE id = $1', [decoded.id]);
     const user = result.rows[0];
     if (!user) return res.status(404).json({ error: 'User tidak ditemukan.' });
-    if (user.otp_code !== otp_code || new Date() > user.otp_expires_at) {
+    if (!user || String(user.otp_code).trim() !== String(otp_code).trim() || new Date() > new Date(user.otp_expires_at)) {
       return res.status(400).json({ error: 'OTP salah atau sudah kedaluwarsa.' });
     }
     
@@ -165,7 +170,12 @@ router.post('/login', authLimiter, loginRules, async (req, res) => {
       const otpCode = generateOTP();
       const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
       await query('UPDATE users SET otp_code = $1, otp_expires_at = $2 WHERE id = $3', [otpCode, otpExpires, user.id]);
-      await sendOTPEmail(email, otpCode).catch(err => console.error('Failed to send OTP:', err));
+      try {
+        await sendOTPEmail(email, otpCode);
+      } catch (mailErr) {
+        console.error('Failed to send OTP:', mailErr);
+        return res.status(500).json({ error: 'Gagal mengirim email OTP: ' + (mailErr.message || 'Periksa konfigurasi SMTP.') });
+      }
       return res.status(403).json({ error: 'Email belum diverifikasi. Cek email untuk OTP baru.', temp_token: signTempToken(user.id, 'otp'), requires_otp: true });
     }
     
@@ -227,8 +237,12 @@ router.post('/forgot-password', authLimiter, async (req, res) => {
     
     await query('UPDATE users SET otp_code = $1, otp_expires_at = $2 WHERE id = $3', [otpCode, otpExpires, user.id]);
     const decryptedEmail = user.email === email ? email : decryptDeterministic(user.email);
-    await sendOTPEmail(decryptedEmail, otpCode).catch(err => console.error('Failed to send OTP:', err));
-    
+    try {
+      await sendOTPEmail(decryptedEmail, otpCode);
+    } catch (mailErr) {
+      console.error('Failed to send OTP:', mailErr);
+      return res.status(500).json({ error: 'Gagal mengirim email OTP: ' + (mailErr.message || 'Periksa konfigurasi SMTP.') });
+    }
     return res.json({ temp_token: signTempToken(user.id, 'reset_pass_otp'), message: 'OTP sent to email' });
   } catch (err) {
     console.error(err);
@@ -247,7 +261,7 @@ router.post('/verify-reset-otp', async (req, res) => {
   try {
     const result = await query('SELECT otp_code, otp_expires_at FROM users WHERE id = $1', [decoded.id]);
     const user = result.rows[0];
-    if (!user || user.otp_code !== otp_code || new Date() > user.otp_expires_at) {
+    if (!user || String(user.otp_code).trim() !== String(otp_code).trim() || new Date() > new Date(user.otp_expires_at)) {
       return res.status(400).json({ error: 'OTP salah atau sudah kedaluwarsa.' });
     }
     
@@ -299,7 +313,12 @@ router.post('/forgot-pin', async (req, res) => {
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
     
     await query('UPDATE users SET otp_code = $1, otp_expires_at = $2 WHERE id = $3', [otpCode, otpExpires, user.id]);
-    await sendOTPEmail(user.email, otpCode).catch(err => console.error('Failed to send OTP:', err));
+    try {
+      await sendOTPEmail(user.email, otpCode);
+    } catch (mailErr) {
+      console.error('Failed to send OTP:', mailErr);
+      return res.status(500).json({ error: 'Gagal mengirim email OTP: ' + (mailErr.message || 'Periksa konfigurasi SMTP.') });
+    }
     
     return res.json({ temp_token: signTempToken(user.id, 'reset_pin_otp'), message: 'OTP sent to email' });
   } catch (err) {
@@ -319,7 +338,7 @@ router.post('/verify-pin-otp', async (req, res) => {
   try {
     const result = await query('SELECT otp_code, otp_expires_at FROM users WHERE id = $1', [decoded.id]);
     const user = result.rows[0];
-    if (!user || user.otp_code !== otp_code || new Date() > user.otp_expires_at) {
+    if (!user || String(user.otp_code).trim() !== String(otp_code).trim() || new Date() > new Date(user.otp_expires_at)) {
       return res.status(400).json({ error: 'OTP salah atau sudah kedaluwarsa.' });
     }
     
